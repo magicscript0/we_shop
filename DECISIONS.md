@@ -6,7 +6,7 @@ This document records all architectural choices, assumptions, and configuration 
 
 ## 1. Project Identity & Defaults
 
-- **Store Name:** متجر وي لخدمات الإنترنت المنزلي (WE Home Internet Store).
+- **Store Name:** متجر باقات WE للإنترنت المنزلي (WE Home Internet Plans Store).
   - *Rationale:* Clean, professional Arabic branding that reflects the authorized intermediary role without falsely claiming to be Telecom Egypt itself.
 - **Audience & Geography:**
   - Egyptian market, individuals seeking high-speed DSL/VDSL fiber home internet plans.
@@ -17,55 +17,87 @@ This document records all architectural choices, assumptions, and configuration 
 
 ---
 
-## 2. Technology Stack
+## 2. Technology Stack & Rendering Strategy
 
 - **Framework:** Next.js 16 (App Router) + TypeScript + React 19.
-  - *Rationale:* Native server-side rendering (SSR) for blazing-fast First Contentful Paint (FCP) on Egyptian 4G/mobile connections. Full support for React Server Components and nested layouts.
-- **Styling:** Tailwind CSS v4 with custom design tokens mapped directly to CSS custom properties.
+  - *Rationale:* Native server-side rendering (SSR) and Static Site Generation (SSG) for blazing-fast First Contentful Paint (FCP) on Egyptian mobile connections. Pre-renders all 34 plan detail pages (`/plans/[slug]`) at build time.
+- **Styling:** Tailwind CSS v4 with custom design tokens mapped directly to CSS custom properties in `src/app/globals.css`.
 - **Typography:**
-  - Headings: `Readex Pro` (Google Fonts, self-hosted via `next/font/google`, subsetted to Arabic + Latin).
-  - Body: `IBM Plex Sans Arabic` (Google Fonts, self-hosted via `next/font/google`, subsetted to Arabic + Latin).
-  - Fallbacks: Cairo, Tajawal, system-ui.
-- **Animation & Motion:**
-  - `framer-motion` for declarative micro-interactions, layout transitions, and interactive states.
-  - Respects `prefers-reduced-motion` project-wide.
-- **Database & Storage:**
-  - Supabase (PostgreSQL 15+, Auth, Storage, Realtime).
-  - Row Level Security (RLS) enabled on 100% of tables.
-  - Private Storage bucket `payment_proofs` with signed URLs (15-minute expiry) for admin review only.
+  - Headings: `Readex Pro` (Google Fonts, weights 400-700, self-hosted via `next/font/google`, subsetted to Arabic + Latin).
+  - Body: `IBM Plex Sans Arabic` (Google Fonts, weights 300-700, self-hosted via `next/font/google`, subsetted to Arabic + Latin).
+- **3D Visuals & Fallbacks:**
+  - Three.js interactive energy ring scene (`Hero3DScene`) with capped DPR (1.5 max) and an `IntersectionObserver` that completely halts WebGL rendering loop when scrolled out of view.
+  - Graceful lightweight SVG fallback (`Hero3DFallback`) triggered on low-end devices, battery-saver modes, or `prefers-reduced-motion`.
+- **Smooth Scrolling:**
+  - Lenis smooth scroll engine initialized via `SmoothScroll.tsx`, strictly respecting `prefers-reduced-motion` settings.
 
 ---
 
-## 3. Data Integrity & Catalog Assumptions
+## 3. Data Integrity & Section 7 Catalog Compliance
 
 - **Exact Plans:**
-  - All 34 plans from Section 7 are preserved verbatim in `supabase/seed.sql`.
+  - All 34 plans from Section 7 are preserved verbatim in `src/lib/constants.ts` and `supabase/seed.sql`.
   - Quotas are strictly explicit (GB/TB). Words like "unlimited", "open", or "unrestricted" are completely banned.
   - The second number next to each family in the original prompt (3 for Super, 2 for Mega/Ultra/Max, 3 TB for Elite) is retained in `tier_note_raw` and **hidden from the public UI** until explicit confirmation from the store owner, as instructed in Section 7.
-  - `speed_mbps` is left `NULL` by default and will only render if populated via the admin dashboard.
+  - `speed_mbps` is left `NULL` by default and will only render if explicitly populated via the admin dashboard.
 - **Pricing & Taxes:**
   - `price_includes_tax`: Stored per plan (default `false` pending accounting decision, clearly noted as "غير شامل ضريبة القيمة المضافة" or configurable via `site_settings`).
   - Orders take an immutable JSON snapshot of the plan (`plan_snapshot`) and prices at the moment of order creation. Future price updates in the catalog never alter existing orders.
 
 ---
 
-## 4. Payment Gateway & Manual Verification
+## 4. Payment Gateway & Manual Transfer Flow
 
-- **Payment Methods:**
-  - Vodafone Cash: Seeded with `01034027398`.
-  - InstaPay, Etisalat Cash, Orange Cash: Initial placeholder records provided in seed migration with configurable account numbers/addresses to be finalized by the owner in Phase 5 / Section 18.
-- **Order State Machine:**
-  - `awaiting_payment` -> `proof_submitted` -> `payment_verified` -> `processing` -> `completed`.
-  - Edge states: `rejected`, `needs_info`, `expired`, `cancelled`, `refunded`.
-  - Transition constraints enforced at the database/API level with full audit trail in `order_events`.
-- **Anti-Fraud & Duplicate Prevention:**
-  - Database constraint `UNIQUE (payment_method, transaction_ref)` stops transaction ID reuse across any orders.
-  - 60-minute countdown is computed strictly on the server (`expires_at = created_at + 60 minutes`) and synchronized with server time.
+- **Manual Transfer Accounts:**
+  - Vodafone Cash: `01034027398`.
+  - InstaPay, Etisalat Cash, Orange Cash configured in admin and seed data.
+- **60-Minute Expiry Countdown:**
+  - Server-enforced timestamp (`expires_at = created_at + 60 minutes`).
+  - Circular animated visual countdown with urgency alerts at 10 minutes and 2 minutes remaining.
+- **Proof Upload Security:**
+  - Strict 5MB file size limit enforced on client and API route (`src/app/api/orders/submit-proof/route.ts`).
+  - Stored in a private Supabase Storage bucket (`payment_proofs`) accessible only to authorized operators with short-lived signed URLs.
+  - Database constraint `UNIQUE(payment_method_id, transaction_ref)` to prevent re-using proof across multiple orders.
 
 ---
 
-## 5. Welcome Discount (50% Off First Order)
+## 5. Anti-Abuse & 50% Welcome Discount Safeguards
 
-- Stored in the `campaigns` table (`is_active = true`, `percent = 50`, `claim_window_days = 7`).
-- Consumed only when payment is verified (`payment_verified`), not merely upon order submission.
-- Tracked via `coupon_redemptions` table with unique line, phone number, and user constraints to prevent multi-account abuse.
+- **Multi-Vector Validation Engine:**
+  - Check 1: User account history (only accounts with 0 completed orders).
+  - Check 2: WE Landline number (must never have redeemed the welcome campaign in `discount_redemptions`).
+  - Check 3: Verified Egyptian mobile phone number (must never have redeemed the welcome campaign).
+  - Check 4: 7-day registration window (expired if account created > 7 days ago).
+- **Financial Risk Controls:**
+  - Configurable maximum subsidy cap (`max_discount_amount`).
+  - Exclude yearly plans option (prevents subsidizing 18 TB yearly plans).
+  - Admin dashboard warning banner when welcome discount is active without a ceiling cap.
+
+---
+
+## 6. Backoffice Administration & RBAC Security
+
+- **Role-Based Access Control (4 Tiers):**
+  - `super_admin`: Full management of plans, pricing, team members, and global settings.
+  - `verifier`: Evaluates proof uploads, approves or rejects payments. No plan or team editing permissions.
+  - `support`: Queries customer and order details, requests information without payment approval rights.
+  - `auditor`: Read-only access to immutable audit logs and export tools.
+- **Immutable Forensic Audit Logging:**
+  - Every administrative state change, price modification, or payment approval generates an audit record containing: `actor_id`, `actor_role`, `action`, `target_table`, `target_id`, `changes (delta)`, `ip_address`, and ISO timestamp.
+- **Arabic Excel Compatibility:**
+  - CSV exports use UTF-8 Byte Order Mark (`\uFEFF`) to prevent character distortion (mojibake) in Egyptian accounting workflows.
+
+---
+
+## 7. Enterprise Security Hardening (Phase 6)
+
+- **HTTP Security Headers (`next.config.ts`):**
+  - `Content-Security-Policy`: Restricts scripts, styles, frames, and font origins.
+  - `Strict-Transport-Security`: `max-age=63072000; includeSubDomains; preload`.
+  - `X-Frame-Options`: `DENY` (prevents clickjacking attacks).
+  - `X-Content-Type-Options`: `nosniff`.
+  - `Referrer-Policy`: `origin-when-cross-origin`.
+  - `Permissions-Policy`: Blocks unauthorized access to camera, microphone, and geolocation.
+- **SEO & Crawling Controls:**
+  - `src/app/robots.ts`: Disallows indexing of `/admin/`, `/api/`, `/checkout/`, `/account/`, `/pay/`.
+  - `src/app/sitemap.ts`: Automatically indexes the 34 static plan pages and public landing pages.
