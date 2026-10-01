@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* WE Purple Palette (Section 4.1) */
+  --we-purple-900: #2a1250;
+  --we-purple-800: #3a1c6e;
+  --we-purple-700: #4a2480;
+  --we-purple-600: #522783;
+  --we-purple-500: #5c2d91; /* Official WE Primary Purple */
+  --we-purple-400: #8059b0;
+  --we-purple-300: #a98bd6;
+  --we-purple-200: #cbbae7;
+  --we-purple-100: #e9e0f5;
+  --we-purple-50: #f6f2fc;
+
+  /* Surfaces & Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f5f7;
+  --bg-subtle: #f8f9fa;
+  --surface-border: #e5e7eb;
+
+  /* Text Colors */
+  --text-primary: #14101f;
+  --text-secondary: #5e5873;
+  --text-muted: #8e8a9f;
+
+  /* CTAs & Accents (Verified contrast 13.7:1) */
+  --cta-neon: #b9f03c;
+  --cta-text: #1b0a33;
+  --accent-orange: #ff7a1a; /* Used for discounts and gifts ONLY */
+
+  /* Plan Family Themes */
+  --family-super: #5c2d91;
+  --family-mega: #4a2480;
+  --family-ultra: #3a1c6e;
+  --family-max: #2a1250;
+  --family-elite: #180829;
+
+  /* Tinted Shadows */
+  --shadow-tinted: 0 10px 25px -5px rgba(92, 45, 145, 0.12), 0 8px 10px -6px rgba(92, 45, 145, 0.08);
+  --shadow-tinted-hover: 0 20px 35px -8px rgba(92, 45, 145, 0.22), 0 10px 15px -5px rgba(92, 45, 145, 0.12);
+  --shadow-neon-glow: 0 0 25px rgba(185, 240, 60, 0.45);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-primary-900: var(--we-purple-900);
+  --color-primary-800: var(--we-purple-800);
+  --color-primary-700: var(--we-purple-700);
+  --color-primary-600: var(--we-purple-600);
+  --color-primary-500: var(--we-purple-500);
+  --color-primary-400: var(--we-purple-400);
+  --color-primary-300: var(--we-purple-300);
+  --color-primary-200: var(--we-purple-200);
+  --color-primary-100: var(--we-purple-100);
+  --color-primary-50: var(--we-purple-50);
+
+  --color-cta-neon: var(--cta-neon);
+  --color-cta-text: var(--cta-text);
+  --color-accent-orange: var(--accent-orange);
+
+  --color-surface-bg: var(--bg-primary);
+  --color-surface-muted: var(--bg-secondary);
+  --color-surface-subtle: var(--bg-subtle);
+
+  --color-text-main: var(--text-primary);
+  --color-text-body: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --font-heading: var(--font-readex-pro), sans-serif;
+  --font-body: var(--font-ibm-plex-arabic), 'Cairo', 'Tajawal', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base Document Configuration (Arabic RTL First) */
+html {
+  direction: rtl;
+  text-align: right;
+  scroll-behavior: smooth;
+  font-family: var(--font-ibm-plex-arabic), 'Cairo', 'Tajawal', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular Numerals for GB and Prices */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Headings Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-readex-pro), sans-serif;
+  font-feature-settings: 'cv01', 'cv02';
+}
+
+/* Subtle Technical Grid Lines */
+.bg-grid-subtle {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(92, 45, 145, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(92, 45, 145, 0.04) 1px, transparent 1px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f5f7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbbae7;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5c2d91;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

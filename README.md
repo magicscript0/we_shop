@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# متجر باقات WE للإنترنت المنزلي (WE Home Internet Plans Store)
 
-## Getting Started
+منصة تجارة إلكترونية متطورة مخصصة لبيع وتجديد باقات الإنترنت المنزلي (DSL / VDSL / فايبر) التابعة للشركة المصرية للاتصالات (WE) في جمهورية مصر العربية، معتمدة على واجهة عربية بالكامل (RTL First)، وبوابة دفع يدوية للمحافظ الإلكترونية المصرية وتطبيق InstaPay، مع لوحة تحكم إدارية للتحقق اليدوي والتفعيل الفوري.
 
-First, run the development server:
+---
 
+## 1. المميزات والخصائص المعمارية
+
+- **واجهة عربية أصيلة (RTL First):** تصميم عصري يراعي اتجاه القراءة العربي والخطوط الطباعية (`Readex Pro` للعناوين و `IBM Plex Sans Arabic` للنصوص) مع استخدام الأرقام اللاتينية داخل الخطوط الطباعية الجدلية (`tabular-nums`) لقراءة الجيجابايت والأسعار بأعلى دقة.
+- **البصمة التصميمية (GB Gauge):** حلقة طاقة تفاعلية مبنية بتقنية SVG لعرض سعة الباقة كرقم بطولي في قلب البطاقة مع توهج ديناميكي وحركة ملء تحاكي تدفق البيانات.
+- **كتالوج رسمي دقيق (34 باقة):** جميع باقات سوبر، ميجا، ألترا، ماكس، وإليت مسجلة بأسعارها وسعاتها الرسمية بدون أي تزييف أو ادعاء بأن الباقات "غير محدودة".
+- **بوابة دفع يدوية مؤمنة:** دعم فودافون كاش (`01034027398`)، إنستاباي، اتصالات كاش، وأورنج كاش مع عداد تنازلي حقيقي مدته 60 دقيقة محسوب على الخادم.
+- **نظام خصم الترحيب (50% للعملاء الجدد):** آلية منع الاحتيال المزدوجة (مرة واحدة لكل حساب، ولكل رقم تليفون أرضي، ولكل رقم محمول موثق).
+- **قاعدة بيانات Supabase (PostgreSQL + RLS):** 15 جدولاً بنظام صلاحيات صارم يضمن عزل بيانات العملاء وإتاحة إدارة كاملة لفريق العمل وفق الأدوار (Customer, Support, Verifier, Admin, Owner).
+
+---
+
+## 2. متطلبات التشغيل والبدء السريع
+
+### المتطلبات
+- **Node.js:** الإصدار 20 أو أحدث (مختبر بنجاح على Node v24).
+- **npm:** الإصدار 10 أو أحدث.
+
+### خطوات التثبيت والتشغيل المحلي
+
+1. **استنساخ المشروع وتثبيت الحزم:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd "shop new premuim"
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **إعداد متغيرات البيئة:**
+قم بنسخ ملف المتغيرات النموذجية إلى `.env.local`:
+```bash
+cp .env.example .env.local
+```
+ثم قم بملء مفاتيح مشروع Supabase الخاص بك:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **تطبيق هجرة قاعدة البيانات والبيانات الأولية:**
+قم بتطبيق ملف الهجرة ثم ملف البذور داخل Supabase SQL Editor:
+- `supabase/migrations/20261001000000_init_schema.sql` (الجداول والفهارس وسياسات RLS)
+- `supabase/seed.sql` (34 باقة رسمية، وسائل الدفع، الحملة الترحيبية، الإعدادات، والأسئلة الشائعة)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **تشغيل خادم التطوير:**
+```bash
+npm run dev
+```
+افتح المتصفح على [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+5. **فحص البناء والاختبارات الآلية:**
+```bash
+# تشغيل الاختبارات الآلية للمسارات الحرجة
+npm test
 
-To learn more about Next.js, take a look at the following resources:
+# فحص بناء الإنتاج الشامل
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 3. تعليمات إعداد Google Cloud OAuth (تسجيل الدخول بجوجل)
 
-## Deploy on Vercel
+لتفعيل تسجيل الدخول بواسطة Google في صفحة الحسابات (Phase 3):
+1. انتقل إلى [Google Cloud Console](https://console.cloud.google.com/).
+2. أنشئ مشروعاً جديداً باسم المتجر.
+3. انتقل إلى **APIs & Services** > **OAuth consent screen**:
+   - حدد نوع المستخدم: **External**.
+   - أدخل اسم المتجر وبريد الدعم وروابط سياسة الخصوصية والشروط (`/privacy` و `/terms`).
+4. انتقل إلى **Credentials** > **Create Credentials** > **OAuth Client ID**:
+   - Application type: **Web application**.
+   - Authorized redirect URIs:
+     - `https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/auth/v1/callback`
+5. انسخ **Client ID** و **Client Secret** وأضفهما في لوحة تحكم Supabase تحت **Authentication** > **Providers** > **Google**.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 4. بنية المجلدات الرئيسية
+
+```text
+├── src/
+│   ├── app/                    # مسارات Next.js App Router والصفحات
+│   │   ├── globals.css         # رموز التصميم و Tailwind CSS v4 و RTL
+│   │   ├── layout.tsx          # إعداد الخطوط (Readex Pro + IBM Plex Arabic)
+│   │   └── page.tsx            # صفحة الواجهة واستعراض الكتالوج التفاعلي
+│   ├── components/
+│   │   ├── layout/             # Header, Footer, Navigation
+│   │   ├── plans/              # PlanCard وبطاقات الباقات
+│   │   └── ui/                 # عناصر واجهة المستخدم (GBGauge, Button, Badge, Card, Input, Tabs, Modal, Icons)
+│   ├── lib/
+│   │   ├── constants.ts        # لوحة الألوان، 34 باقة، أكواد المحافظات
+│   │   ├── utils.ts            # أدوات التحقق من التليفون الأرضي والمحمول والأسعار
+│   │   └── supabase/           # عملاء Supabase للمتصفح والخادم
+│   └── types/
+│       └── database.ts         # الأنواع البرمجية المتطابقة مع قاعدة البيانات
+├── supabase/
+│   ├── migrations/             # ملفات إنشاء الجداول والسياسات الأمنية
+│   └── seed.sql                # البيانات المعتمدة للباقات وطرق الدفع
+├── tests/
+│   └── phase1-foundation.test.mjs # 18 اختباراً للمسارات الحرجة
+├── DECISIONS.md                # سجل القرارات الفنية والمعمارية
+└── .env.example                # نموذج متغيرات البيئة
+```
+
+---
+
+## 5. مصفوفة التحقق والاختبارات (Test Matrix)
+
+تم تنفيذ 18 اختباراً آلياً باستخدام محرك اختبارات Node.js المدمج تغطي:
+- مطابقة الـ 34 باقة كاملة لبيانات البند 7 (سوبر 16، ميجا 8، ألترا 6، ماكس 3، إليت 1).
+- احتجاز خانة `speed_mbps` كقيمة فارغة `null` افتراضياً وعدم عرضها إلا عند إدخالها من لوحة الإدارة.
+- صحة عمليات خصم الـ 50% الترحيبي وتطبيق سقف الخصم `max_discount_amount`.
+- التدقيق الصارم على أرقام التليفون الأرضي لكود القليوبية (`013` - 7 أرقام) وكود القاهرة/الجيزة (`02` - 8 أرقام).
+- التحقق من أرقام المحمول المصرية ومقدمات الشبكات الأربعة (010, 011, 012, 015).
+- مصفوفة الانتقال بين حالات الطلب السليمة ومنع القفزات غير القانونية للاحتيال.
