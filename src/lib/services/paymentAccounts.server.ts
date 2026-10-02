@@ -100,6 +100,13 @@ export function isPlaceholderAccount(account: Partial<ServerPaymentAccount>): {
 }
 
 /**
+ * Helper to check raw string account number
+ */
+export function isPlaceholderAccountNumber(accountValue: string): boolean {
+  return isPlaceholderAccount({ account_value: accountValue, is_verified: true }).isPlaceholder;
+}
+
+/**
  * Securely retrieves destination payment account for an order
  * Enforces ownership and payable state.
  */

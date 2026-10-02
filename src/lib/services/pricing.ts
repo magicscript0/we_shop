@@ -168,3 +168,50 @@ export function calculatePlanPricing(
     formatted_total_due: formatPriceEgp(totalDue, curr),
   };
 }
+
+export const PRICING_SETTINGS_STORAGE_KEY = 'we_store_pricing_settings';
+export const PRICING_SETTINGS_UPDATED_EVENT = 'we_store_pricing_settings_updated';
+
+/**
+ * Get stored pricing settings (falls back to DEFAULT_PRICING_SETTINGS)
+ */
+export function getStoredPricingSettings(): PricingSettings {
+  if (typeof window === 'undefined') {
+    return DEFAULT_PRICING_SETTINGS;
+  }
+  try {
+    const raw = localStorage.getItem(PRICING_SETTINGS_STORAGE_KEY);
+    if (!raw) return DEFAULT_PRICING_SETTINGS;
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_PRICING_SETTINGS, ...parsed };
+  } catch {
+    return DEFAULT_PRICING_SETTINGS;
+  }
+}
+
+/**
+ * Save pricing settings to browser storage and dispatch event
+ */
+export function saveStoredPricingSettings(updates: Partial<PricingSettings>): PricingSettings {
+  if (typeof window === 'undefined') return DEFAULT_PRICING_SETTINGS;
+  const current = getStoredPricingSettings();
+  const merged: PricingSettings = { ...current, ...updates };
+  localStorage.setItem(PRICING_SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+  window.dispatchEvent(
+    new CustomEvent(PRICING_SETTINGS_UPDATED_EVENT, { detail: merged })
+  );
+  return merged;
+}
+
+/**
+ * Reset pricing settings to default
+ */
+export function resetPricingSettingsToDefault(): PricingSettings {
+  if (typeof window === 'undefined') return DEFAULT_PRICING_SETTINGS;
+  localStorage.removeItem(PRICING_SETTINGS_STORAGE_KEY);
+  window.dispatchEvent(
+    new CustomEvent(PRICING_SETTINGS_UPDATED_EVENT, { detail: DEFAULT_PRICING_SETTINGS })
+  );
+  return DEFAULT_PRICING_SETTINGS;
+}
+

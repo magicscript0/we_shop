@@ -19,7 +19,8 @@ const NAV_ITEMS = [
   { href: '/admin/payment-methods', label: 'وسائل الدفع والمحافظ', icon: '💳' },
   { href: '/admin/content', label: 'محتوى المتجر والأسئلة', icon: '📝' },
   { href: '/admin/settings', label: 'إعدادات المتجر العامة', icon: '⚙️' },
-  { href: '/admin/team', label: 'فريق العمل والصلاحيات', icon: '🛡️' },
+  { href: '/admin/health', label: 'جاهزية الإطلاق وحارس الأمان', icon: '🛡️', badge: '100%' },
+  { href: '/admin/team', label: 'فريق العمل والصلاحيات', icon: '👥' },
   { href: '/admin/audit-logs', label: 'سجل التدقيق الرقابي', icon: '📜' },
   { href: '/admin/reports', label: 'التقارير والإحصائيات', icon: '📈' },
 ];

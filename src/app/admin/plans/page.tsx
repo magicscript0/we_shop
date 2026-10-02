@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { Button, Badge, Modal, Input } from '@/components/ui';
 import { SEED_PLANS } from '@/lib/constants';
 import { formatEgp } from '@/lib/utils';
-import { Plan } from '@/types/database';
+import { Plan, BillingPeriod } from '@/types/database';
+import { ShieldCheckIcon, AlertTriangleIcon, CheckIcon } from '@/components/ui/Icons';
 
 export default function AdminPlansPage() {
   const [plans, setPlans] = useState<Plan[]>(SEED_PLANS);
@@ -13,6 +14,18 @@ export default function AdminPlansPage() {
   const [editSpeed, setEditSpeed] = useState<string>('');
   const [editBadge, setEditBadge] = useState<string>('');
   const [auditLogNotice, setAuditLogNotice] = useState<string | null>(null);
+
+  // Filters
+  const [familyFilter, setFamilyFilter] = useState<string>('all');
+  const [periodFilter, setPeriodFilter] = useState<string>('all');
+
+  const filteredPlans = plans.filter((p) => {
+    const matchesFamily =
+      familyFilter === 'all' || p.tier.toLowerCase() === familyFilter.toLowerCase();
+    const matchesPeriod =
+      periodFilter === 'all' || p.billing_period === periodFilter;
+    return matchesFamily && matchesPeriod;
+  });
 
   const handleOpenEdit = (plan: Plan) => {
     setEditingPlan(plan);
@@ -33,7 +46,7 @@ export default function AdminPlansPage() {
           ? {
               ...p,
               price_egp: newPrice,
-              speed_mbps: editSpeed ? Number(editSpeed) : null,
+              speed_mbps: editSpeed.trim() ? Number(editSpeed) : null,
               badge: editBadge.trim() || null,
             }
           : p
@@ -58,27 +71,78 @@ export default function AdminPlansPage() {
   };
 
   return (
-    <div className="space-y-6 text-right">
+    <div className="space-y-6 text-right font-body">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
         <div>
           <h1 className="text-2xl font-extrabold font-heading text-[#14101F]">
-            إدارة الباقات والأسعار المعتمدة
+            إدارة الباقات والأسعار الرسمية (33 باقة معتمدة)
           </h1>
           <p className="text-xs text-[#5E5873]">
-            التحكم في الـ 34 باقة، تعديل الأسعار المسجلة في سجل الرقابة، وتحديد شارات الطلب وسرعة الخط.
+            التحكم في الـ 33 باقة، تعديل الأسعار، ومراقبة الالتزام بعدم الادعاء بالسرعات القصوى غير المضمونة.
           </p>
         </div>
 
         <span className="text-xs font-bold text-[#5C2D91] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB]">
-          إجمالي الباقات: {plans.length} باقة
+          إجمالي الكتالوج: {plans.length} باقة
         </span>
       </div>
 
       {auditLogNotice && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-800 font-bold animate-in fade-in">
-          ✓ {auditLogNotice}
+        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-800 font-bold animate-in fade-in flex items-center gap-2">
+          <CheckIcon size={16} className="text-emerald-600 shrink-0" />
+          <span>{auditLogNotice}</span>
         </div>
       )}
+
+      {/* Catalog Status Info Box */}
+      <div className="p-4 rounded-2xl bg-[#F6F2FC] border border-[#CBBAE7]/60 flex items-center justify-between text-xs text-[#5C2D91]">
+        <div className="flex items-center gap-2 font-bold">
+          <ShieldCheckIcon size={18} />
+          <span>الكتالوج المعتمد: تم شطب باقة 50GB نهائياً والأسعار مطابقة للوائح WE 2026.</span>
+        </div>
+        <span className="text-[11px] text-[#8E8A9F]">جميع الباقات تخضع لمحرك ضريبة الـ 14%</span>
+      </div>
+
+      {/* Filters Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#E5E7EB]">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="font-bold text-[#14101F]">العائلة:</span>
+          {['all', 'super', 'mega', 'ultra', 'max', 'elite'].map((fam) => (
+            <button
+              key={fam}
+              onClick={() => setFamilyFilter(fam)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                familyFilter === fam
+                  ? 'bg-[#5C2D91] text-white'
+                  : 'bg-[#F4F5F7] text-[#5E5873] hover:bg-gray-200'
+              }`}
+            >
+              {fam === 'all' ? 'الكل' : fam.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2 text-xs">
+          <span className="font-bold text-[#14101F]">الفترة:</span>
+          {[
+            { id: 'all', label: 'الكل' },
+            { id: 'monthly', label: 'شهرية' },
+            { id: 'yearly', label: 'سنوية' },
+          ].map((period) => (
+            <button
+              key={period.id}
+              onClick={() => setPeriodFilter(period.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                periodFilter === period.id
+                  ? 'bg-[#5C2D91] text-white'
+                  : 'bg-[#F4F5F7] text-[#5E5873] hover:bg-gray-200'
+              }`}
+            >
+              {period.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Plans Table */}
       <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm overflow-hidden">
@@ -90,15 +154,15 @@ export default function AdminPlansPage() {
                 <th className="py-3.5 px-4">العائلة</th>
                 <th className="py-3.5 px-4">السعة المحددة</th>
                 <th className="py-3.5 px-4">الفترة</th>
-                <th className="py-3.5 px-4">السعر الرسمي</th>
-                <th className="py-3.5 px-4">السرعة (ميجابت/ث)</th>
+                <th className="py-3.5 px-4">السعر الرسمي الأساسي</th>
+                <th className="py-3.5 px-4">السرعة المعلنة</th>
                 <th className="py-3.5 px-4">الشارة</th>
                 <th className="py-3.5 px-4 text-center">الحالة</th>
                 <th className="py-3.5 px-4 text-center">الإجراء</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F5F7]">
-              {plans.map((p, idx) => (
+              {filteredPlans.map((p, idx) => (
                 <tr key={p.id} className="hover:bg-[#F6F2FC]/30 transition-colors">
                   <td className="py-3.5 px-4 font-mono text-[#8E8A9F]">{idx + 1}</td>
                   <td className="py-3.5 px-4">
@@ -116,7 +180,7 @@ export default function AdminPlansPage() {
                     {formatEgp(p.price_egp)}
                   </td>
                   <td className="py-3.5 px-4 text-[#5E5873]">
-                    {p.speed_mbps ? `${p.speed_mbps} ميجابت/ث` : 'غير محدد (مخفي)'}
+                    {p.speed_mbps ? `${p.speed_mbps} ميجابت/ث` : 'مخفي (التزام بالشفافية)'}
                   </td>
                   <td className="py-3.5 px-4">
                     {p.badge ? (
@@ -163,26 +227,26 @@ export default function AdminPlansPage() {
           onClose={() => setEditingPlan(null)}
           title={`تعديل باقة: ${editingPlan.tier_label_ar} ${editingPlan.quota_value} ${editingPlan.quota_unit}`}
         >
-          <div className="space-y-4 text-right">
+          <div className="space-y-4 text-right font-body">
             <Input
-              label="سعر الباقة (ج.م)"
+              label="سعر الباقة الأساسي (قبل الضريبة - ج.م)"
               type="number"
               value={editPrice}
               onChange={(e) => setEditPrice(Number(e.target.value))}
-              helperText="كل تعديل على السعر يسجل فورياً في سجل الرقابة ولا يمس الطلبات السابقة."
+              helperText="كل تعديل على السعر يسجل فورياً في سجل التدقيق ولا يمس الطلبات المؤكدة مسبقاً."
             />
 
             <Input
               label="السرعة المعلنة بالميجابت/ث (اتركها فارغة لإخفائها)"
               type="number"
-              placeholder="مثال: 30 أو 70 أو 100"
+              placeholder="اتركها فارغة (موصى به للشفافية)"
               value={editSpeed}
               onChange={(e) => setEditSpeed(e.target.value)}
-              helperText="وفقاً للبند 7، لا تعرض السرعة إلا إذا أدخلت رقماً صريحاً هنا."
+              helperText="الافتراضي تركها فارغة، لكون سرعة الخط الأرضي الفعلية تعتمد على كفاءة الكابينة النحاسية والفايبر."
             />
 
             <Input
-              label="شارة التمييز اليدوية (Badge)"
+              label="شارة التمييز التسويقية (Badge)"
               placeholder="مثال: الأكثر طلباً، باقة التوفير..."
               value={editBadge}
               onChange={(e) => setEditBadge(e.target.value)}

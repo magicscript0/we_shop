@@ -3,12 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { GiftIcon, ShieldCheckIcon, ArrowLeftRTL, ZapIcon } from '@/components/ui/Icons';
+import { useCms } from '@/lib/hooks/useCms';
 
 interface HeroOfferSealProps {
   onOpenTerms?: () => void;
 }
 
 export const HeroOfferSeal: React.FC<HeroOfferSealProps> = ({ onOpenTerms }) => {
+  const cms = useCms();
+
+  if (!cms['hero.seal_active']) return null;
+
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2A1250] via-[#3A1C6E] to-[#1B0A33] border-2 border-[#B9F03C]/40 p-6 sm:p-7 text-white shadow-[0_10px_35px_-5px_rgba(185,240,60,0.15)] text-right">
       {/* Background Accent Glow */}
@@ -20,7 +25,7 @@ export const HeroOfferSeal: React.FC<HeroOfferSealProps> = ({ onOpenTerms }) => 
         <div className="flex items-center justify-between gap-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B9F03C] text-[#1B0A33] text-xs font-black font-heading shadow-md">
             <GiftIcon size={14} />
-            <span>عرض الترحيب الحصري</span>
+            <span>{cms['hero.seal_tag'] || 'عرض الترحيب الحصري'}</span>
           </div>
 
           <span className="text-[11px] font-semibold text-[#cbbae7]">
@@ -55,10 +60,10 @@ export const HeroOfferSeal: React.FC<HeroOfferSealProps> = ({ onOpenTerms }) => 
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/15 space-y-1">
             <div className="flex items-center justify-between font-bold">
               <span className="text-white">باقة سوبر 500 GB</span>
-              <span className="text-[#B9F03C] font-mono text-sm">402 ج.م</span>
+              <span className="text-[#B9F03C] font-mono text-sm">376 ج.م</span>
             </div>
             <p className="text-[11px] text-[#cbbae7]">
-              بدلاً من <span className="line-through text-white/60">752 ج.م</span> شامل الضريبة (توفير 350 ج.م)
+              بدلاً من <span className="line-through text-white/60">752 ج.م</span> شامل الضريبة (توفير 330 ج.م)
             </p>
           </div>
         </div>

@@ -13,6 +13,7 @@ import { SEED_PLANS, getCheapestActivePlan } from '@/lib/constants';
 import { BillingPeriod } from '@/types/database';
 import { HeroOfferSeal } from '@/components/offer/HeroOfferSeal';
 import { OfferTermsModal } from '@/components/offer/OfferTermsModal';
+import { useCms } from '@/lib/hooks/useCms';
 import {
   ShieldCheckIcon,
   ZapIcon,
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/Icons';
 
 export default function Home() {
+  const cms = useCms();
   const cheapestPlan = getCheapestActivePlan();
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
@@ -54,33 +56,13 @@ export default function Home() {
     { id: 'yearly' as BillingPeriod, label: 'باقات سنوية (خصم أكبر)' },
   ];
 
-  const faqItems = [
-    {
-      question: 'كيف يتم تفعيل وشحن الباقة على خطي بعد الدفع؟',
-      answer:
-        'بعد اختيار باقتك وإدخال رقم التليفون الأرضي وإتمام التحويل عبر وسيلة الدفع المفضلة، يقوم فريق التحقق بمراجعة العملية وتفعيل الباقة مباشرة على خطك عبر الأنظمة المعتمدة وتصلك رسالة وإشعار فوري باكتمال الشحن.',
-    },
-    {
-      question: 'هل باقات الإنترنت المنزلي من WE غير محدودة؟',
-      answer:
-        'لا، جميع باقات الإنترنت المنزلي في مصر محددة بسعة تحميل صريحة (جيجابايت أو تيرابايت) وفقاً للوائح الرسمية الصادرة عن الشركة المصرية للاتصالات والجهاز القومي لتنظيم الاتصالات. بعد نفاد السعة تنخفض السرعة للحد الأدنى حتى موعد التجديد أو شحن سعة إضافية.',
-    },
-    {
-      question: 'ما هي مهلة العداد التنازلي لإرسال إثبات الدفع؟',
-      answer:
-        'فور إنشاء الطلب يبدأ عداد تنازلي مدته 60 دقيقة محسوب على الخادم يضمن لك حجز الباقة بسعرها الحالي. المهلة مخصصة لإتمام التحويل ورفع لقطة الشاشة ورقم العملية، وبمجرد رفع الإثبات يتوقف العداد وتبدأ مرحلة المراجعة.',
-    },
-    {
-      question: 'ما هي وسائل الدفع المقبولة في المتجر؟',
-      answer:
-        'نقبل جميع وسائل الدفع الإلكترونية المحلية في مصر: محفظة فودافون كاش، تطبيق InstaPay للتحويل اللحظي المجاني، محفظة اتصالات كاش، ومحفظة أورنج كاش. تظهر بيانات الحساب المعتمدة مباشرة في صفحة الدفع الخاصة بكل طلب.',
-    },
-    {
-      question: 'ما هي الشروط المطبقة على هدية التسجيل لأول مرة؟',
-      answer:
-        'الهدية الترحيبية مخصصة للعملاء الجدد عند إنشاء أول حساب، وتطبق تلقائياً على الطلب الأول فقط لمرة واحدة لكل خط تليفون أرضي ورقم هاتف موثق، وتظل صالحة لمدة 7 أيام من تاريخ التسجيل.',
-    },
-  ];
+  const faqItems = (cms.faqs || [])
+    .filter((f) => f.isPublished)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((f) => ({
+      question: f.question,
+      answer: f.answer,
+    }));
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#14101F]">
@@ -98,17 +80,15 @@ export default function Home() {
             <div className="lg:col-span-7 space-y-6 text-right">
               <div className="inline-flex items-center gap-2 bg-[#B9F03C] text-[#1B0A33] px-3.5 py-1.5 rounded-full text-xs font-bold font-heading shadow-md">
                 <ShieldCheckIcon size={16} />
-                <span>وكيل ووسيط معتمد لخدمات المصرية للاتصالات WE</span>
+                <span>{cms['hero.badge']}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-heading tracking-tight leading-[1.15]">
-                باقات <span className="text-[#B9F03C]">WE</span> للإنترنت المنزلي
-                <br />
-                بشحن موثوق ودفع محلي
+                {cms['hero.title']}
               </h1>
 
               <p className="text-base sm:text-lg text-[#cbbae7] max-w-2xl leading-relaxed">
-                اشترك وجدد باقات الإنترنت المنزلي لسعات تبدأ من {cheapestPlan.quota_value} جيجابايت حتى 18 تيرابايت. ادفع فورياً عبر فودافون كاش وتطبيق إنستاباي مع متابعة حية لحالة الشحن على خطك.
+                {cms['hero.subtitle']}
               </p>
 
               {/* Action Buttons */}
@@ -119,7 +99,7 @@ export default function Home() {
                     size="lg"
                     rightIcon={<ArrowLeftRTL size={20} />}
                   >
-                    اختر باقتك الآن
+                    {cms['hero.cta_primary']}
                   </Button>
                 </Link>
 
@@ -130,7 +110,7 @@ export default function Home() {
                     className="text-white border-white/30 hover:bg-white/10"
                     rightIcon={<ClockIcon size={18} />}
                   >
-                    تتبع طلبك الحالي
+                    {cms['hero.cta_secondary']}
                   </Button>
                 </Link>
               </div>
@@ -293,10 +273,10 @@ export default function Home() {
                   1
                 </div>
                 <h3 className="font-heading font-bold text-base text-[#14101F] mb-1">
-                  اختر باقتك
+                  {cms['steps.1.title']}
                 </h3>
                 <p className="text-xs text-[#5E5873] leading-relaxed">
-                  تصفح باقات سوبر وميجا وألترا وماكس واختر السعة المناسبة لاحتياجك.
+                  {cms['steps.1.desc']}
                 </p>
               </div>
 
@@ -306,10 +286,10 @@ export default function Home() {
                   2
                 </div>
                 <h3 className="font-heading font-bold text-base text-[#14101F] mb-1">
-                  أدخل رقم الخط الأرضي
+                  {cms['steps.2.title']}
                 </h3>
                 <p className="text-xs text-[#5E5873] leading-relaxed">
-                  اكتب رقم التليفون الأرضي لخط الإنترنت الخاص بك وتأكد من صحة كود المحافظة.
+                  {cms['steps.2.desc']}
                 </p>
               </div>
 
@@ -319,10 +299,10 @@ export default function Home() {
                   3
                 </div>
                 <h3 className="font-heading font-bold text-base text-[#14101F] mb-1">
-                  حوّل المبلغ وارفع الإيصال
+                  {cms['steps.3.title']}
                 </h3>
                 <p className="text-xs text-[#5E5873] leading-relaxed">
-                  سدد عبر فودافون كاش أو إنستاباي خلال عداد 60 دقيقة وارفع لقطة الشاشة.
+                  {cms['steps.3.desc']}
                 </p>
               </div>
 
@@ -332,10 +312,10 @@ export default function Home() {
                   4
                 </div>
                 <h3 className="font-heading font-bold text-base text-[#14101F] mb-1">
-                  التحقق والشحن
+                  {cms['steps.4.title']}
                 </h3>
                 <p className="text-xs text-[#5E5873] leading-relaxed">
-                  يتحقق فريق المراجعة من التحويل ويتم شحن الباقة على خطك وإشعارك فورياً.
+                  {cms['steps.4.desc']}
                 </p>
               </div>
             </div>
@@ -362,10 +342,10 @@ export default function Home() {
                 <ShieldCheckIcon size={26} />
               </div>
               <h3 className="font-heading font-bold text-base text-[#14101F] mb-2">
-                وكيل وموزع معتمد
+                {cms['why_us.1.title']}
               </h3>
               <p className="text-xs text-[#5E5873] leading-relaxed">
-                نعمل كوسيط معتمد لخدمات المصرية للاتصالات WE وفق العقود واللوائح الرسمية.
+                {cms['why_us.1.desc']}
               </p>
             </div>
 
@@ -374,10 +354,10 @@ export default function Home() {
                 <WalletIcon size={26} />
               </div>
               <h3 className="font-heading font-bold text-base text-[#14101F] mb-2">
-                طرق دفع محلية ميسرة
+                {cms['why_us.2.title']}
               </h3>
               <p className="text-xs text-[#5E5873] leading-relaxed">
-                ادفع من محفظتك على الموبايل (فودافون، اتصالات، أورنج) أو عبر تطبيق إنستاباي اللحظي.
+                {cms['why_us.2.desc']}
               </p>
             </div>
 
@@ -386,10 +366,10 @@ export default function Home() {
                 <ClockIcon size={26} />
               </div>
               <h3 className="font-heading font-bold text-base text-[#14101F] mb-2">
-                تتبع فوري للطلب
+                {cms['why_us.3.title']}
               </h3>
               <p className="text-xs text-[#5E5873] leading-relaxed">
-                شاهد مراحل مراجعة إيصالك وتأكيده وبدء التفعيل مباشرة وبشكل لحظي بدون الحاجة لتحديث الصفحة.
+                {cms['why_us.3.desc']}
               </p>
             </div>
 
@@ -398,10 +378,10 @@ export default function Home() {
                 <ZapIcon size={26} />
               </div>
               <h3 className="font-heading font-bold text-base text-[#14101F] mb-2">
-                دعم فني وتذاكر فورية
+                {cms['why_us.4.title']}
               </h3>
               <p className="text-xs text-[#5E5873] leading-relaxed">
-                فريق خدمة عملاء متواجد يومياً لمساعدتك والإجابة على أي استفسارات تخص خطك.
+                {cms['why_us.4.desc']}
               </p>
             </div>
           </div>
