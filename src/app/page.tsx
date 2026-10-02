@@ -68,7 +68,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#14101F]">
       <Header />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* 1. Hero Section with 3D/Orbit Scene */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[#2A1250] via-[#3A1C6E] to-[#5C2D91] text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8">
           {/* Background Ambient Glow & Grid */}

@@ -14,6 +14,14 @@ export const Header: React.FC = () => {
 
   return (
     <>
+      {/* Skip to Main Content Link (a11y) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-50 focus:bg-[#5C2D91] focus:text-white focus:px-4 focus:py-2 focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#B9F03C] text-xs font-bold font-heading"
+      >
+        تخطي إلى المحتوى الرئيسي
+      </a>
+
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB]">
         {/* Top Dismissible Announcement Bar (Change 3) */}
         <AnnouncementBar onOpenTerms={() => setTermsModalOpen(true)} />

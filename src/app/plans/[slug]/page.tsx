@@ -15,10 +15,46 @@ import {
   ArrowLeftRTL,
   RouterIcon,
 } from '@/components/ui/Icons';
+import type { Metadata } from 'next';
 import { Plan } from '@/types/database';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const plan = SEED_PLANS.find((p) => p.slug === slug);
+  if (!plan) {
+    return {
+      title: 'الباقة غير موجودة',
+    };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://we-store.eg';
+  const pricing = calculatePlanPricing(plan.price_egp);
+  const periodLabel = plan.billing_period === 'yearly' ? 'السنوية' : 'الشهرية';
+  const title = `باقة ${plan.tier_label_ar} ${plan.quota_value} ${plan.quota_unit} ${periodLabel}`;
+  const description = `اشحن باقة WE إنترنت منزلي ${plan.tier_label_ar} سعة ${plan.quota_value} ${plan.quota_unit} بسعر ${pricing.formatted_total_due} شامل ضريبة القيمة المضافة 14%. دفع فوري وتفعيل موثوق.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${siteUrl}/plans/${plan.slug}`,
+    },
+    openGraph: {
+      title: `${title} | متجر باقات WE`,
+      description,
+      url: `${siteUrl}/plans/${plan.slug}`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | متجر باقات WE`,
+      description,
+    },
+  };
 }
 
 export async function generateStaticParams() {
@@ -40,11 +76,37 @@ export default async function PlanDetailsPage({ params }: PageProps) {
     (p) => p.tier === plan.tier && p.id !== plan.id
   ).slice(0, 3);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://we-store.eg';
+  const pricing = calculatePlanPricing(plan.price_egp);
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: `باقة WE إنترنت منزلي ${plan.tier_label_ar} ${plan.quota_value} ${plan.quota_unit}`,
+    description: `باقة إنترنت منزلي رسمية بسعة ${plan.quota_value} ${plan.quota_unit} وسرعة فائقة من المصرية للاتصالات WE.`,
+    sku: plan.slug,
+    offers: {
+      '@type': 'Offer',
+      price: pricing.total_due,
+      priceCurrency: 'EGP',
+      priceValidUntil: '2026-12-31',
+      availability: 'https://schema.org/InStock',
+      url: `${siteUrl}/plans/${plan.slug}`,
+      seller: {
+        '@type': 'Organization',
+        name: 'متجر باقات WE للإنترنت المنزلي',
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#14101F]">
       <Header />
 
       <main className="flex-1 bg-[#F8F9FA] py-10 px-4 sm:px-6 lg:px-8">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Breadcrumb Navigation */}
           <nav className="flex items-center gap-2 text-xs text-[#5E5873]" dir="rtl">
