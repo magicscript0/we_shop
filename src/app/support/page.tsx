@@ -37,17 +37,17 @@ export default function SupportPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-            {/* Direct WhatsApp Box */}
+            {/* Official Support Info Box */}
             <div className="md:col-span-5 bg-gradient-to-br from-[#2A1250] to-[#5C2D91] text-white rounded-3xl p-8 space-y-6 shadow-xl flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#B9F03C] text-[#1B0A33] flex items-center justify-center font-bold">
-                  WA
+                  WE
                 </div>
                 <h2 className="text-xl font-bold font-heading text-white">
-                  تواصل فوري عبر واتساب
+                  مركز المساعدة المعتمد
                 </h2>
                 <p className="text-xs text-[#cbbae7] leading-relaxed">
-                  أسرع طريقة للحصول على رد فوري بخصوص شحن وتأكيد باقتك أو الاستفسار عن كود التحويل.
+                  فريق دعم فني متخصص للرد الفوري على استفسارات باقات الإنترنت المنزلي وتأكيد عمليات الشحن ومتابعة التجديد.
                 </p>
               </div>
 
@@ -58,23 +58,24 @@ export default function SupportPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <ShieldCheckIcon size={16} className="text-[#B9F03C]" />
-                  <span>الرقم المعتمد: 01034027398</span>
+                  <span>البريد المعتمد: support@westore-eg.com</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheckIcon size={16} className="text-[#B9F03C]" />
+                  <span>متوسط سرعة الاستجابة: أقل من 15 دقيقة</span>
                 </div>
 
-                <a
-                  href="https://wa.me/201034027398?text=مرحباً،%20أحتاج%20مساعدة%20بخصوص%20باقات%20WE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block pt-2"
-                >
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full text-center"
-                  >
-                    فتح محادثة واتساب الآن ↗
-                  </Button>
-                </a>
+                <div className="pt-2">
+                  <a href="/track" className="block">
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="w-full text-center"
+                    >
+                      تتبع حالة طلبك برقم الطلب ↗
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
 

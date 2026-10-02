@@ -41,8 +41,8 @@ export default function AdminContentPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [heroTitle, setHeroTitle] = useState('باقات WE للإنترنت المنزلي بشحن موثوق ودفع محلي');
-  const [heroSubtitle, setHeroSubtitle] = useState('اشترك وجدد باقات الإنترنت المنزلي لسعات تبدأ من 50 جيجابايت حتى 18 تيرابايت.');
-  const [whatsappPhone, setWhatsappPhone] = useState('01034027398');
+  const [heroSubtitle, setHeroSubtitle] = useState('اشترك وجدد باقات الإنترنت المنزلي لسعات تبدأ من 200 جيجابايت حتى 18 تيرابايت.');
+  const [supportEmail, setSupportEmail] = useState('support@westore-eg.com');
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
   const handleSaveFaq = () => {
@@ -122,10 +122,10 @@ export default function AdminContentPage() {
           />
 
           <Input
-            label="رقم واتساب المعتمد لخدمة العملاء"
-            value={whatsappPhone}
-            onChange={(e) => setWhatsappPhone(e.target.value)}
-            helperText="الرقم الفعلي المرتبط بمحادثات الدعم المباشرة."
+            label="البريد الإلكتروني المعتمد لخدمة العملاء"
+            value={supportEmail}
+            onChange={(e) => setSupportEmail(e.target.value)}
+            helperText="البريد المعتمد لتلقي إشعارات الشحن ومراسلات الدعم الفني."
           />
 
           <Button type="submit" variant="secondary" size="md">

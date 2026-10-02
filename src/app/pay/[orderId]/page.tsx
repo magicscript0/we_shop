@@ -45,6 +45,16 @@ export default function PaymentGatewayPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Securely fetched destination account details (Change 4.3)
+  const [accountDetails, setAccountDetails] = useState<{
+    accountValue: string;
+    accountHolderName: string;
+    instructionsMd: string;
+    isVerified?: boolean;
+  } | null>(null);
+  const [accountLoading, setAccountLoading] = useState<boolean>(true);
+  const [accountError, setAccountError] = useState<string | null>(null);
+
   // Load Order Data
   useEffect(() => {
     // 1. Try to load from session storage
@@ -54,7 +64,7 @@ export default function PaymentGatewayPage() {
         try {
           const parsed = JSON.parse(stored) as Order;
           setOrder(parsed);
-          setAmountSent(String(parsed.price_final));
+          setAmountSent(String(parsed.total_due || parsed.price_final));
 
           // Set matching payment method
           if (parsed.payment_method_id) {
@@ -75,7 +85,7 @@ export default function PaymentGatewayPage() {
       }
     }
 
-    // Fallback Mock Order for demonstration
+    // Fallback Mock Order for demonstration with full VAT pricing (Change 2)
     const expiry = new Date(Date.now() + 59 * 60 * 1000 + 45 * 1000);
     const mock: Order = {
       id: orderId,
@@ -85,10 +95,15 @@ export default function PaymentGatewayPage() {
       status: 'awaiting_payment',
       we_line_number: '3214567',
       line_governorate_code: '013',
-      customer_phone: '01034027398',
+      customer_phone: '01012345678',
       price_original: 660,
       discount_amount: 330,
-      price_final: 330,
+      net_amount: 330,
+      vat_rate: 14,
+      vat_amount: 46.2,
+      rounding_adjustment: -0.2,
+      total_due: 376,
+      price_final: 376,
       campaign_id: 'camp-welcome',
       plan_snapshot: {
         tier: 'Super',
@@ -106,8 +121,37 @@ export default function PaymentGatewayPage() {
     };
 
     setOrder(mock);
-    setAmountSent(String(mock.price_final));
+    setAmountSent(String(mock.total_due || mock.price_final));
   }, [orderId]);
+
+  // Securely fetch account number on client only for this active order (Change 4.3)
+  useEffect(() => {
+    if (!order) return;
+    setAccountLoading(true);
+    setAccountError(null);
+
+    const methodKey = paymentMethod.key || 'vodafone_cash';
+    fetch(`/api/orders/${orderId}/payment-account?methodKey=${methodKey}&status=${order.status}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setAccountError(data.error);
+        } else {
+          setAccountDetails({
+            accountValue: data.accountValue,
+            accountHolderName: data.accountHolderName,
+            instructionsMd: data.instructionsMd,
+            isVerified: data.isVerified,
+          });
+        }
+      })
+      .catch(() => {
+        setAccountError('تعذر الاتصال بالخادم لجلب بيانات الحساب.');
+      })
+      .finally(() => {
+        setAccountLoading(false);
+      });
+  }, [orderId, order?.status, paymentMethod.key]);
 
   // Live Server-Clock Synchronized Countdown Timer
   useEffect(() => {
@@ -304,24 +348,20 @@ export default function PaymentGatewayPage() {
                 {isExpired && (
                   <div className="mt-4 pt-3 border-t border-rose-200 text-xs text-rose-800">
                     <span>هل قمت بالتحويل بالفعل ولكن الوقت انتهى؟ </span>
-                    <a
-                      href={`https://wa.me/201034027398?text=${encodeURIComponent(
-                        `مرحباً، قمت بالتحويل لطلبي رقم ${order?.order_number} ولكن انتهى وقت العداد التنازلي.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      href={`/support?orderId=${encodeURIComponent(order?.order_number || orderId)}&issue=late_proof`}
                       className="font-bold underline text-rose-900"
                     >
-                      تواصل معنا لإرفاق الإيصال متأخراً (Late Proof) ↗
-                    </a>
+                      قدّم طلب مراجعة إيصال متأخر عبر الدعم الفني ↗
+                    </Link>
                   </div>
                 )}
               </div>
 
-              {/* Exact Amount Due Box with Copy Button */}
+              {/* Exact Amount Due Box with Copy Button (Change 2) */}
               <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm p-6 space-y-4 text-right">
                 <div className="flex items-center justify-between pb-3 border-b border-[#F4F5F7]">
-                  <span className="text-xs font-bold text-[#5E5873]">المبلغ المطلوب تحويله بدقة:</span>
+                  <span className="text-xs font-bold text-[#5E5873]">المبلغ المطلوب تحويله بدقة (شامل الضريبة):</span>
                   <Badge variant="family" tier={order?.plan_snapshot?.tier as any || 'Super'}>
                     {order?.plan_snapshot?.tier_label_ar} {order?.plan_snapshot?.quota_value} {order?.plan_snapshot?.quota_unit}
                   </Badge>
@@ -329,12 +369,12 @@ export default function PaymentGatewayPage() {
 
                 <div className="flex items-center justify-between p-4 rounded-2xl bg-[#F6F2FC] border border-[#CBBAE7]/50">
                   <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#5C2D91] tabular-nums">
-                    {formatEgp(order?.price_final || 330)}
+                    {formatEgp(order?.total_due || order?.price_final || 376)}
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => handleCopy(String(order?.price_final || 330), 'amount')}
+                    onClick={() => handleCopy(String(order?.total_due || order?.price_final || 376), 'amount')}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#CBBAE7] text-xs font-bold text-[#5C2D91] hover:bg-[#F6F2FC] transition-colors cursor-pointer"
                   >
                     {copiedField === 'amount' ? (
@@ -351,7 +391,23 @@ export default function PaymentGatewayPage() {
                   </button>
                 </div>
 
-                {/* Transfer Fee Note (Section 10.1 & 10.4) */}
+                {/* Breakdown Mini Summary */}
+                <div className="text-xs text-[#5E5873] space-y-1 pt-1 border-t border-[#F4F5F7]">
+                  <div className="flex justify-between">
+                    <span>السعر بعد الخصم:</span>
+                    <span className="tabular-nums font-semibold">
+                      {formatEgp(order?.net_amount || (order?.price_original ? order.price_original - (order.discount_amount || 0) : 330))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ضريبة القيمة المضافة (14%):</span>
+                    <span className="tabular-nums font-semibold">
+                      + {formatEgp(order?.vat_amount || 46.2)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Transfer Fee Note */}
                 <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
                   <AlertTriangleIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
                   <span>
@@ -360,49 +416,74 @@ export default function PaymentGatewayPage() {
                 </div>
               </div>
 
-              {/* Receiving Account Box with Copy Button */}
+              {/* Receiving Account Box with Copy Button (Change 4.3 & 4.4) */}
               <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm p-6 space-y-4 text-right">
                 <div className="flex items-center justify-between pb-2 border-b border-[#F4F5F7]">
                   <h3 className="font-heading font-bold text-sm text-[#14101F]">
                     بيانات التحويل ({paymentMethod.label_ar})
                   </h3>
-                  <span className="text-xs text-[#5C2D91] font-bold">حساب معتمد</span>
+                  <span className="text-xs text-[#5C2D91] font-bold">
+                    {accountDetails?.isVerified ? 'حساب معتمد وموثق' : 'حساب التحويل المباشر'}
+                  </span>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-xs text-[#5E5873]">الرقم / العنوان المستلم:</span>
-                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F4F5F7] border border-[#E2E8F0]">
-                    <span className="font-mono font-bold text-base sm:text-lg text-[#14101F]" dir="ltr">
-                      {paymentMethod.account_value}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(paymentMethod.account_value, 'account')}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-xs font-bold text-[#14101F] hover:bg-[#F8F9FA] transition-colors cursor-pointer"
-                    >
-                      {copiedField === 'account' ? (
-                        <>
-                          <CheckIcon size={14} className="text-emerald-600" />
-                          <span className="text-emerald-700">تم النسخ</span>
-                        </>
-                      ) : (
-                        <>
-                          <CopyIcon size={14} />
-                          <span>نسخ الرقم</span>
-                        </>
-                      )}
-                    </button>
+                {accountLoading ? (
+                  <div className="p-4 rounded-2xl bg-gray-50 text-center text-xs text-gray-500 animate-pulse">
+                    جارٍ تأمين واستخراج بيانات الحساب المعتمد لهذا الطلب...
                   </div>
-                </div>
-
-                {/* Transfer Steps */}
-                <div className="pt-2 text-xs text-[#5E5873] space-y-1.5 leading-relaxed">
-                  <span className="font-bold text-[#14101F] block mb-1">خطوات التحويل:</span>
-                  <div className="whitespace-pre-line bg-[#F8F9FA] p-3 rounded-xl border border-[#E5E7EB]">
-                    {paymentMethod.instructions_md}
+                ) : accountError ? (
+                  <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 leading-relaxed">
+                    <p className="font-bold mb-1">تنبيه الحماية:</p>
+                    <p>{accountError}</p>
+                    <div className="mt-2">
+                      <Link href="/support" className="underline font-bold text-rose-900">
+                        تواصل مع فريق الدعم المباشر للمساعدة ↗
+                      </Link>
+                    </div>
                   </div>
-                </div>
+                ) : accountDetails ? (
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <span className="text-xs text-[#5E5873]">الرقم / العنوان المستلم:</span>
+                      <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F4F5F7] border border-[#E2E8F0]">
+                        <span className="font-mono font-bold text-base sm:text-lg text-[#14101F]" dir="ltr">
+                          {accountDetails.accountValue}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(accountDetails.accountValue, 'account')}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-xs font-bold text-[#14101F] hover:bg-[#F8F9FA] transition-colors cursor-pointer"
+                        >
+                          {copiedField === 'account' ? (
+                            <>
+                              <CheckIcon size={14} className="text-emerald-600" />
+                              <span className="text-emerald-700">تم النسخ</span>
+                            </>
+                          ) : (
+                            <>
+                              <CopyIcon size={14} />
+                              <span>نسخ الرقم</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-[#5E5873] bg-[#F8F9FA] p-3 rounded-xl border border-gray-100">
+                      <span className="font-semibold text-[#14101F] block mb-0.5">اسم صاحب الحساب:</span>
+                      <span>{accountDetails.accountHolderName}</span>
+                    </div>
+
+                    {/* Transfer Steps */}
+                    <div className="pt-1 text-xs text-[#5E5873] space-y-1.5 leading-relaxed">
+                      <p className="font-bold text-[#14101F]">تعليمات السداد:</p>
+                      <p className="whitespace-pre-line bg-purple-50/50 p-2.5 rounded-xl border border-purple-100 text-[#2A1250]">
+                        {accountDetails.instructionsMd}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 

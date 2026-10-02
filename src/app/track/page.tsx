@@ -156,18 +156,14 @@ export default function TrackOrderPage() {
                 </div>
               </div>
 
-              {/* WhatsApp Support Direct Button */}
+              {/* Support Direct Button */}
               <div className="pt-2 text-center">
-                <a
-                  href={`https://wa.me/201034027398?text=${encodeURIComponent(
-                    `مرحباً، أستفسر عن طلبي رقم: ${mockOrder.orderNumber}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={`/support?order=${encodeURIComponent(mockOrder.orderNumber)}`}
                   className="inline-flex items-center gap-2 text-xs font-bold text-[#5C2D91] hover:underline"
                 >
-                  <span>هل تحتاج لمساعدة فورية بخصوص هذا الطلب؟ تواصل معنا عبر واتساب ↗</span>
-                </a>
+                  <span>هل تحتاج لمساعدة فورية بخصوص هذا الطلب؟ فتح تذكرة دعم فني ↗</span>
+                </Link>
               </div>
             </div>
           )}

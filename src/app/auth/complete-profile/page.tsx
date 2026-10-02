@@ -96,7 +96,7 @@ export default function CompleteProfilePage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 error={phone.length >= 11 && !phoneValid ? 'رقم هاتف مصري غير صحيح' : undefined}
-                helperText="يستخدم لتأكيد العمليات والتواصل معك عبر واتساب."
+                helperText="يستخدم لتأكيد العمليات وتلقي إشعارات الشحن ومتابعة الطلبات."
               />
 
               <div className="space-y-1.5">

@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { GBGauge, Button, Badge, Card } from '@/components/ui';
 import { SEED_PLANS } from '@/lib/constants';
 import { formatEgp } from '@/lib/utils';
+import { calculatePlanPricing, formatPriceEgp } from '@/lib/services/pricing';
 import {
   ShieldCheckIcon,
   ZapIcon,
@@ -97,22 +98,66 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {/* Price Banner */}
-              <div className="p-5 rounded-2xl bg-[#F4F5F7] border border-[#E5E7EB]">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-extrabold font-heading text-[#14101F] tabular-nums">
-                    {formatEgp(plan.price_egp)}
-                  </span>
-                  <span className="text-xs text-[#5E5873]">
-                    / {plan.billing_period === 'yearly' ? 'سنة كاملة' : 'شهرياً'}
-                  </span>
-                </div>
-                <p className="text-xs text-[#8E8A9F] mt-1">
-                  {plan.price_includes_tax
-                    ? 'الأسعار شاملة ضريبة القيمة المضافة'
-                    : 'الأسعار غير شاملة ضريبة القيمة المضافة (14%)'}
-                </p>
-              </div>
+              {/* Pricing Breakdown Card (Change 2.3) */}
+              {(() => {
+                const pricing = calculatePlanPricing(plan.price_egp, {
+                  percent: 50,
+                  is_eligible: true,
+                  name_ar: 'خصم الترحيب 50%',
+                });
+
+                return (
+                  <div className="p-6 rounded-2xl bg-[#F8F9FA] border-2 border-[#E9E0F5] space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+                      <span className="text-sm font-semibold text-[#5E5873]">السعر الأساسي قبل الضريبة</span>
+                      <span className="text-base font-bold text-[#14101F] tabular-nums">
+                        {pricing.formatted_base}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-[#FF7A1A] font-semibold">
+                      <span>خصم الترحيب للعملاء الجدد (−50%)</span>
+                      <span className="tabular-nums">− {pricing.formatted_discount}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-[#5E5873]">
+                      <span>ضريبة القيمة المضافة القانونية (14%)</span>
+                      <span className="tabular-nums font-medium">+ {pricing.formatted_vat}</span>
+                    </div>
+
+                    {pricing.rounding_adjustment !== 0 && (
+                      <div className="flex items-center justify-between text-xs text-[#8E8A9F]">
+                        <span>تقريب لأقرب جنيه</span>
+                        <span className="tabular-nums">{pricing.formatted_rounding}</span>
+                      </div>
+                    )}
+
+                    {/* Most Prominent Element: Total Due */}
+                    <div className="pt-3 border-t-2 border-[#5C2D91]/20 flex items-baseline justify-between bg-[#F3EEFA] p-4 rounded-xl">
+                      <div>
+                        <span className="text-sm sm:text-base font-bold font-heading text-[#2A1250] block">
+                          الإجمالي المستحق بعد الضريبة
+                        </span>
+                        <span className="text-[11px] text-[#5E5873]">
+                          المبلغ الفعلي المطلوب تحويله لتفعيل الخط فورياً
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-3xl sm:text-4xl font-extrabold font-heading text-[#5C2D91] tabular-nums block">
+                          {pricing.formatted_total_due}
+                        </span>
+                        <span className="text-[11px] text-[#8E8A9F] line-through tabular-nums">
+                          بدون العرض: {calculatePlanPricing(plan.price_egp).formatted_total_due}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-[#8E8A9F] text-center">
+                      * العرض الترحيبي سارٍ لأول طلب للعميل الجديد ولمرة واحدة لكل خط أرضي.
+                    </p>
+                  </div>
+                );
+              })()}
 
               {/* Mandatory Quota Policy Clarification */}
               <div className="space-y-2.5 text-xs text-[#5E5873]">
@@ -131,12 +176,12 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                 <div className="flex items-start gap-2">
                   <CheckIcon size={16} className="text-[#5C2D91] shrink-0 mt-0.5" />
                   <span>
-                    <strong>طرق الدفع:</strong> فودافون كاش، تطبيق إنستاباي، اتصالات كاش، وأورنج كاش.
+                    <strong>طرق الدفع بالتحويل الفوري:</strong> فودافون كاش، تطبيق إنستاباي، اتصالات كاش، وأورنج كاش.
                   </span>
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Action Button & In-Site Support */}
               <div className="pt-2 flex flex-col sm:flex-row gap-3">
                 <Link
                   href={`/checkout?planId=${plan.id}`}
@@ -152,18 +197,11 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                   </Button>
                 </Link>
 
-                <a
-                  href={`https://wa.me/201034027398?text=${encodeURIComponent(
-                    `مرحباً، أود الاستفسار عن باقة ${plan.tier_label_ar} ${plan.quota_value} ${plan.quota_unit} بسعر ${plan.price_egp} ج.م`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0"
-                >
+                <Link href="/support" className="shrink-0">
                   <Button variant="outline" size="lg">
-                    استفسار عبر واتساب
+                    مركز الدعم والمساعدة
                   </Button>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -4,56 +4,55 @@ import assert from 'node:assert/strict';
 // Plan data definition directly matching Section 7 and seed.sql
 const SEED_PLANS = [
   // Super Monthly
-  { id: '1', slug: 'super-monthly-50gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 50, quota_unit: 'GB', price_egp: 150, sort_order: 1 },
-  { id: '2', slug: 'super-monthly-200gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 200, quota_unit: 'GB', price_egp: 330, sort_order: 2 },
-  { id: '3', slug: 'super-monthly-250gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 395, sort_order: 3 },
-  { id: '4', slug: 'super-monthly-300gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 300, quota_unit: 'GB', price_egp: 460, sort_order: 4 },
-  { id: '5', slug: 'super-monthly-400gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 400, quota_unit: 'GB', price_egp: 580, sort_order: 5 },
-  { id: '6', slug: 'super-monthly-500gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 660, sort_order: 6 },
-  { id: '7', slug: 'super-monthly-750gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 925, sort_order: 7 },
-  { id: '8', slug: 'super-monthly-1500gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 1650, sort_order: 8 },
+  { id: '1', slug: 'super-monthly-200gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 200, quota_unit: 'GB', price_egp: 330, sort_order: 1 },
+  { id: '2', slug: 'super-monthly-250gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 395, sort_order: 2 },
+  { id: '3', slug: 'super-monthly-300gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 300, quota_unit: 'GB', price_egp: 460, sort_order: 3 },
+  { id: '4', slug: 'super-monthly-400gb', tier: 'Super', billing_period: 'monthly', quota_value: 400, quota_unit: 'GB', price_egp: 580, sort_order: 4 },
+  { id: '5', slug: 'super-monthly-500gb', tier: 'Super', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 660, sort_order: 5 },
+  { id: '6', slug: 'super-monthly-750gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 925, sort_order: 6 },
+  { id: '7', slug: 'super-monthly-1500gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 1650, sort_order: 7 },
 
   // Super Yearly
-  { id: '9', slug: 'super-yearly-1800gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 1800, quota_unit: 'GB', price_egp: 3120, sort_order: 9 },
-  { id: '10', slug: 'super-yearly-2400gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 2400, quota_unit: 'GB', price_egp: 3960, sort_order: 10 },
-  { id: '11', slug: 'super-yearly-3000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 4345, sort_order: 11 },
-  { id: '12', slug: 'super-yearly-3600gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 3600, quota_unit: 'GB', price_egp: 5060, sort_order: 12 },
-  { id: '13', slug: 'super-yearly-4800gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 4800, quota_unit: 'GB', price_egp: 6380, sort_order: 13 },
-  { id: '14', slug: 'super-yearly-6000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 6930, sort_order: 14 },
-  { id: '15', slug: 'super-yearly-9000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 9715, sort_order: 15 },
-  { id: '16', slug: 'super-yearly-18tb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 16500, sort_order: 16 },
+  { id: '8', slug: 'super-yearly-1800gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 1800, quota_unit: 'GB', price_egp: 3120, sort_order: 8 },
+  { id: '9', slug: 'super-yearly-2400gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 2400, quota_unit: 'GB', price_egp: 3960, sort_order: 9 },
+  { id: '10', slug: 'super-yearly-3000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 4345, sort_order: 10 },
+  { id: '11', slug: 'super-yearly-3600gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 3600, quota_unit: 'GB', price_egp: 5060, sort_order: 11 },
+  { id: '12', slug: 'super-yearly-4800gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 4800, quota_unit: 'GB', price_egp: 6380, sort_order: 12 },
+  { id: '13', slug: 'super-yearly-6000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 6930, sort_order: 13 },
+  { id: '14', slug: 'super-yearly-9000gb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 9715, sort_order: 14 },
+  { id: '15', slug: 'super-yearly-18tb', tier: 'Super', tier_label_ar: 'سوبر', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 16500, sort_order: 15 },
 
   // Mega Monthly
-  { id: '17', slug: 'mega-monthly-250gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 590, sort_order: 17 },
-  { id: '18', slug: 'mega-monthly-500gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 900, sort_order: 18 },
-  { id: '19', slug: 'mega-monthly-750gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1175, sort_order: 19 },
-  { id: '20', slug: 'mega-monthly-1500gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2000, sort_order: 20 },
+  { id: '16', slug: 'mega-monthly-250gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 590, sort_order: 16 },
+  { id: '17', slug: 'mega-monthly-500gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 900, sort_order: 17 },
+  { id: '18', slug: 'mega-monthly-750gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1175, sort_order: 18 },
+  { id: '19', slug: 'mega-monthly-1500gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2000, sort_order: 19 },
 
   // Mega Yearly
-  { id: '21', slug: 'mega-yearly-3000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 6490, sort_order: 21 },
-  { id: '22', slug: 'mega-yearly-6000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 9450, sort_order: 22 },
-  { id: '23', slug: 'mega-yearly-9000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 12340, sort_order: 23 },
-  { id: '24', slug: 'mega-yearly-18tb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 20000, sort_order: 24 },
+  { id: '20', slug: 'mega-yearly-3000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 6490, sort_order: 20 },
+  { id: '21', slug: 'mega-yearly-6000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 9450, sort_order: 21 },
+  { id: '22', slug: 'mega-yearly-9000gb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 12340, sort_order: 22 },
+  { id: '23', slug: 'mega-yearly-18tb', tier: 'Mega', tier_label_ar: 'ميجا', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 20000, sort_order: 23 },
 
   // Ultra Monthly
-  { id: '25', slug: 'ultra-monthly-250gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 785, sort_order: 25 },
-  { id: '26', slug: 'ultra-monthly-500gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 1150, sort_order: 26 },
-  { id: '27', slug: 'ultra-monthly-750gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1425, sort_order: 27 },
+  { id: '24', slug: 'ultra-monthly-250gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 785, sort_order: 24 },
+  { id: '25', slug: 'ultra-monthly-500gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 1150, sort_order: 25 },
+  { id: '26', slug: 'ultra-monthly-750gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1425, sort_order: 26 },
 
   // Ultra Yearly
-  { id: '28', slug: 'ultra-yearly-3000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 8635, sort_order: 28 },
-  { id: '29', slug: 'ultra-yearly-6000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 12075, sort_order: 29 },
-  { id: '30', slug: 'ultra-yearly-9000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 14965, sort_order: 30 },
+  { id: '27', slug: 'ultra-yearly-3000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 8635, sort_order: 27 },
+  { id: '28', slug: 'ultra-yearly-6000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 12075, sort_order: 28 },
+  { id: '29', slug: 'ultra-yearly-9000gb', tier: 'Ultra', tier_label_ar: 'ألترا', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 14965, sort_order: 29 },
 
   // Max Monthly
-  { id: '31', slug: 'max-monthly-1500gb', tier: 'Max', tier_label_ar: 'ماكس', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2350, sort_order: 31 },
-  { id: '32', slug: 'max-plus-monthly-1500gb', tier: 'Max Plus', tier_label_ar: 'ماكس بلس', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2700, sort_order: 32 },
+  { id: '30', slug: 'max-monthly-1500gb', tier: 'Max', tier_label_ar: 'ماكس', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2350, sort_order: 30 },
+  { id: '31', slug: 'max-plus-monthly-1500gb', tier: 'Max Plus', tier_label_ar: 'ماكس بلس', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2700, sort_order: 31 },
 
   // Max Yearly
-  { id: '33', slug: 'max-yearly-18tb', tier: 'Max', tier_label_ar: 'ماكس', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 23500, sort_order: 33 },
+  { id: '32', slug: 'max-yearly-18tb', tier: 'Max', tier_label_ar: 'ماكس', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 23500, sort_order: 32 },
 
   // Elite (other)
-  { id: '34', slug: 'elite-3tb', tier: 'Elite', tier_label_ar: 'إليت', billing_period: 'other', quota_value: 3, quota_unit: 'TB', price_egp: 3500, sort_order: 34 },
+  { id: '33', slug: 'elite-3tb', tier: 'Elite', tier_label_ar: 'إليت', billing_period: 'other', quota_value: 3, quota_unit: 'TB', price_egp: 3500, sort_order: 33 },
 ];
 
 function filterPlans({ search = '', family = 'all', period = 'all', quotaFilter = 'all', sort = 'default' }) {
@@ -61,11 +60,11 @@ function filterPlans({ search = '', family = 'all', period = 'all', quotaFilter 
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       const match =
-        plan.tier.toLowerCase().includes(q) ||
-        plan.tier_label_ar.includes(q) ||
+        (plan.tier && plan.tier.toLowerCase().includes(q)) ||
+        (plan.tier_label_ar && plan.tier_label_ar.includes(q)) ||
         String(plan.quota_value).includes(q) ||
         String(plan.price_egp).includes(q) ||
-        plan.quota_unit.toLowerCase().includes(q);
+        (plan.quota_unit && plan.quota_unit.toLowerCase().includes(q));
       if (!match) return false;
     }
     if (family !== 'all' && !plan.tier.toLowerCase().includes(family.toLowerCase())) {
@@ -129,7 +128,7 @@ describe('Phase 2 Public UI Tests', () => {
 
     test('Sort by price-asc orders lowest price first', () => {
       const results = filterPlans({ sort: 'price-asc' });
-      assert.strictEqual(results[0].price_egp, 150);
+      assert.strictEqual(results[0].price_egp, 330);
       assert.strictEqual(results[results.length - 1].price_egp, 23500);
     });
 
@@ -142,10 +141,11 @@ describe('Phase 2 Public UI Tests', () => {
   });
 
   describe('2. Dynamic Route Slug Generation & Completeness', () => {
-    test('All 34 plans have valid unique slugs', () => {
+    test('All 33 plans have valid unique slugs', () => {
       const slugs = SEED_PLANS.map((p) => p.slug);
       const uniqueSlugs = new Set(slugs);
-      assert.strictEqual(uniqueSlugs.size, 34);
+      assert.strictEqual(uniqueSlugs.size, 33);
+      assert.strictEqual(uniqueSlugs.has('super-monthly-50gb'), false);
     });
 
     test('Slugs follow standard URL hyphenated naming', () => {
@@ -161,9 +161,9 @@ describe('Phase 2 Public UI Tests', () => {
       assert.strictEqual(new URL(officialUrl).hostname, 'te.eg');
     });
 
-    test('Customer support phone is 01034027398', () => {
-      const phone = '01034027398';
-      assert.match(phone, /^010\d{8}$/);
+    test('Official support channel is verified and valid email format', () => {
+      const email = 'support@westore-eg.com';
+      assert.match(email, /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
     });
   });
 });

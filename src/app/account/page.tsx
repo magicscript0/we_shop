@@ -30,7 +30,7 @@ export default function AccountPage() {
   const user = {
     name: 'أحمد محمود',
     email: 'ahmed@example.com',
-    phone: '01034027398',
+    phone: '01012345678',
     role: 'customer',
     hasWelcomeDiscount: true,
     discountDaysLeft: 6,

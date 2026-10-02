@@ -110,16 +110,14 @@ export const Footer: React.FC = () => {
                 أورنج كاش
               </span>
             </div>
-            <div className="pt-2 text-xs text-[#8E8A9F]">
-              <span>الدعم الفني عبر واتساب: </span>
-              <a
-                href="https://wa.me/201034027398"
-                target="_blank"
-                rel="noopener noreferrer"
+            <div className="pt-2 text-xs text-[#8E8A9F] flex items-center gap-2">
+              <span>الدعم الفني والشكاوى: </span>
+              <Link
+                href="/support"
                 className="text-[#B9F03C] font-semibold hover:underline"
               >
-                01034027398
-              </a>
+                مركز تذاكر الدعم المباشر
+              </Link>
             </div>
           </div>
         </div>

@@ -39,9 +39,11 @@ export interface PaymentMethod {
   id: string;
   key: 'vodafone_cash' | 'instapay' | 'etisalat_cash' | 'orange_cash' | string;
   label_ar: string;
-  account_value: string;
-  account_holder_name: string;
-  instructions_md: string;
+  sub_label?: string;
+  badge?: string | null;
+  account_value?: string;
+  account_holder_name?: string;
+  instructions_md?: string;
   fee_note: string;
   min_amount: number;
   max_amount: number;
@@ -75,6 +77,11 @@ export interface Order {
   price_original: number;
   discount_amount: number;
   price_final: number;
+  net_amount?: number;
+  vat_rate?: number;
+  vat_amount?: number;
+  rounding_adjustment?: number;
+  total_due?: number;
   campaign_id: string | null;
   plan_snapshot: {
     tier: string;
@@ -85,6 +92,11 @@ export interface Order {
     price_egp: number;
     slug: string;
   };
+  offer_snapshot?: {
+    percent: number;
+    max_discount_amount: number | null;
+    name_ar?: string;
+  } | null;
   expires_at: string;
   payment_method_id: string | null;
   internal_notes?: string | null;

@@ -9,6 +9,7 @@ import { Input, Button, Badge, GBGauge } from '@/components/ui';
 import { SEED_PLANS, SEED_PAYMENT_METHODS, GOVERNORATE_CODES } from '@/lib/constants';
 import { isValidWeLineNumber, isValidEgyptianMobile, formatEgp } from '@/lib/utils';
 import { calculateServerDiscount } from '@/lib/services/discount';
+import { calculatePlanPricing, formatPriceEgp } from '@/lib/services/pricing';
 import { ShieldCheckIcon, WalletIcon, ArrowLeftRTL, CheckIcon, AlertTriangleIcon } from '@/components/ui/Icons';
 import { Plan } from '@/types/database';
 
@@ -28,8 +29,8 @@ function CheckoutContent() {
   const [governorateCode, setGovernorateCode] = useState(initialCodeParam);
   const [lineNumber, setLineNumber] = useState(initialLineParam);
   const [confirmLineNumber, setConfirmLineNumber] = useState(initialLineParam);
-  const [customerPhone, setCustomerPhone] = useState('01034027398');
-  const [customerName, setCustomerName] = useState('عميل المتجر');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [selectedMethodKey, setSelectedMethodKey] = useState('vodafone_cash');
   const [agreeTerms, setAgreeTerms] = useState(true);
 
@@ -250,14 +251,14 @@ function CheckoutContent() {
                         <span className="font-heading font-bold text-sm text-[#14101F] block">
                           {method.label_ar}
                         </span>
-                        <span className="text-xs text-[#5E5873] block mt-0.5 font-mono">
-                          {method.account_value}
+                        <span className="text-xs text-[#5E5873] block mt-0.5">
+                          {method.sub_label || (method.key === 'instapay' ? 'تحويل لحظي مجاني' : 'محفظة إلكترونية')}
                         </span>
                       </div>
                     </div>
 
                     <span className="text-xs font-semibold text-[#5C2D91] bg-white px-2.5 py-1 rounded-lg border border-[#CBBAE7]">
-                      {method.key === 'instapay' ? 'فوري مجاني' : 'محفظة إلكترونية'}
+                      {method.sub_label || (method.key === 'instapay' ? 'فوري مجاني' : 'محفظة إلكترونية')}
                     </span>
                   </label>
                 );
@@ -295,44 +296,71 @@ function CheckoutContent() {
               />
             </div>
 
-            {/* Price Calculations Breakdown */}
-            <div className="space-y-3 pt-2 text-xs border-t border-[#F4F5F7]">
-              <div className="flex items-center justify-between text-[#5E5873]">
-                <span>سعر الباقة الأساسي:</span>
-                <span className="font-bold tabular-nums text-[#14101F] text-sm">
-                  {formatEgp(discountCalculation.originalPrice)}
-                </span>
-              </div>
+            {/* Price Calculations Breakdown (Change 2) */}
+            {(() => {
+              const pricing = calculatePlanPricing(
+                selectedPlan.price_egp,
+                discountCalculation.isEligible
+                  ? {
+                      percent: discountCalculation.percent,
+                      max_discount_amount: null,
+                      is_eligible: true,
+                      name_ar: 'خصم الترحيب 50%',
+                    }
+                  : null
+              );
 
-              {/* Welcome Discount Explicit Line (Section 9) */}
-              {discountCalculation.isEligible && (
-                <div className="flex items-center justify-between text-[#FF7A1A] font-semibold bg-[#FFF2EA] p-2.5 rounded-xl border border-[#FFD2B3]">
-                  <div className="flex items-center gap-1.5">
-                    <span>خصم الترحيب للعملاء الجدد (50%):</span>
+              return (
+                <div className="space-y-3 pt-2 text-xs border-t border-[#F4F5F7]">
+                  <div className="flex items-center justify-between text-[#5E5873]">
+                    <span>سعر الباقة الأساسي قبل الضريبة:</span>
+                    <span className="font-bold tabular-nums text-[#14101F] text-sm">
+                      {pricing.formatted_base}
+                    </span>
                   </div>
-                  <span className="font-bold tabular-nums text-sm">
-                    - {formatEgp(discountCalculation.discountAmount)}
-                  </span>
-                </div>
-              )}
 
-              <div className="flex items-center justify-between text-[#5E5873] pt-1">
-                <span>ضريبة القيمة المضافة (14%):</span>
-                <span className="text-[11px] text-[#8E8A9F]">
-                  غير شاملة (تدفع مع الفاتورة)
-                </span>
-              </div>
+                  {pricing.has_offer && (
+                    <div className="flex items-center justify-between text-[#FF7A1A] font-semibold bg-[#FFF2EA] p-2.5 rounded-xl border border-[#FFD2B3]">
+                      <div className="flex items-center gap-1.5">
+                        <span>خصم الترحيب للعملاء الجدد (50%):</span>
+                      </div>
+                      <span className="font-bold tabular-nums text-sm">
+                        − {pricing.formatted_discount}
+                      </span>
+                    </div>
+                  )}
 
-              {/* Total Due */}
-              <div className="pt-3 border-t border-[#E5E7EB] flex items-baseline justify-between">
-                <span className="font-heading font-bold text-base text-[#14101F]">
-                  المبلغ الإجمالي للدفع:
-                </span>
-                <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#5C2D91] tabular-nums">
-                  {formatEgp(discountCalculation.finalPrice)}
+                  <div className="flex items-center justify-between text-[#5E5873] pt-1">
+                    <span>ضريبة القيمة المضافة (14%):</span>
+                    <span className="font-semibold tabular-nums text-[#14101F]">
+                      + {pricing.formatted_vat}
+                    </span>
+                  </div>
+
+                  {pricing.rounding_adjustment !== 0 && (
+                    <div className="flex items-center justify-between text-xs text-[#8E8A9F]">
+                      <span>تقريب لأقرب جنيه:</span>
+                      <span className="tabular-nums">{pricing.formatted_rounding}</span>
+                    </div>
+                  )}
+
+                  {/* Total Due */}
+                  <div className="pt-3 border-t-2 border-[#5C2D91]/20 bg-[#F3EEFA] p-3 rounded-xl flex items-baseline justify-between">
+                    <div>
+                      <span className="font-heading font-bold text-sm text-[#2A1250] block">
+                        المبلغ الإجمالي المستحق للدفع:
+                      </span>
+                      <span className="text-[10px] text-[#5E5873]">
+                        المبلغ الإجمالي النهائي شامل الضريبة (14%)
+                      </span>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#5C2D91] tabular-nums">
+                      {pricing.formatted_total_due}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Agreement to terms */}
             <div className="pt-2 text-right">

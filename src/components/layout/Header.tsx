@@ -18,7 +18,9 @@ export const Header: React.FC = () => {
             <span>وكيل وموزع معتمد لخدمات المصرية للاتصالات (WE)</span>
           </div>
           <div className="hidden sm:flex items-center gap-3 text-[#cbbae7]">
-            <span>خدمة العملاء: 01034027398</span>
+            <Link href="/support" className="hover:text-white transition-colors">
+              الدعم الفني وخدمة العملاء
+            </Link>
             <span>|</span>
             <span>ساعات العمل: 9:00 ص - 11:00 م</span>
           </div>

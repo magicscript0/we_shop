@@ -17,10 +17,10 @@ export default function AdminPaymentMethodsPage() {
 
   const handleOpenEdit = (m: PaymentMethod) => {
     setEditingMethod(m);
-    setAccountValue(m.account_value);
-    setAccountHolder(m.account_holder_name);
-    setInstructions(m.instructions_md);
-    setFeeNote(m.fee_note);
+    setAccountValue(m.account_value || '');
+    setAccountHolder(m.account_holder_name || '');
+    setInstructions(m.instructions_md || '');
+    setFeeNote(m.fee_note || '');
   };
 
   const handleSave = () => {

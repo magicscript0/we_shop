@@ -46,6 +46,15 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/plans/super-monthly-50gb',
+        destination: '/plans',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

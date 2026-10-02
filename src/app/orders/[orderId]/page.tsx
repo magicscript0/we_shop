@@ -51,7 +51,7 @@ export default function OrderDetailsStatusPage() {
       status: 'proof_submitted',
       we_line_number: '3214567',
       line_governorate_code: '013',
-      customer_phone: '01034027398',
+      customer_phone: '01012345678',
       price_original: 660,
       discount_amount: 330,
       price_final: 330,
@@ -271,20 +271,16 @@ export default function OrderDetailsStatusPage() {
               </div>
             </div>
 
-            {/* Direct WhatsApp Support Button (Section 11) */}
+            {/* Direct Ticket Support Button */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href={`https://wa.me/201034027398?text=${encodeURIComponent(
-                  `مرحباً، أتابع حالة طلبي رقم: ${order?.order_number || orderId}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={`/support?orderId=${encodeURIComponent(order?.order_number || orderId)}`}
                 className="w-full sm:w-auto"
               >
                 <Button variant="outline" size="md" className="w-full sm:w-auto">
-                  تواصل مع خدمة العملاء عبر واتساب ↗
+                  تواصل مع الدعم الفني للطلب ↗
                 </Button>
-              </a>
+              </Link>
 
               <Link href="/account" className="w-full sm:w-auto">
                 <Button variant="ghost" size="md" className="w-full sm:w-auto">

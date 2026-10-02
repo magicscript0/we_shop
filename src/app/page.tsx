@@ -9,7 +9,7 @@ import { QuickActions } from '@/components/home/QuickActions';
 import { FaqAccordion } from '@/components/home/FaqAccordion';
 import { PlanCard } from '@/components/plans/PlanCard';
 import { Button, Tabs, Badge } from '@/components/ui';
-import { SEED_PLANS } from '@/lib/constants';
+import { SEED_PLANS, getCheapestActivePlan } from '@/lib/constants';
 import { BillingPeriod } from '@/types/database';
 import {
   ShieldCheckIcon,
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/Icons';
 
 export default function Home() {
+  const cheapestPlan = getCheapestActivePlan();
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<BillingPeriod>('monthly');
 
@@ -34,7 +35,7 @@ export default function Home() {
       plan.billing_period === selectedPeriod ||
       (plan.billing_period === 'other' && selectedPeriod === 'monthly');
     return matchesFamily && matchesPeriod;
-  }).slice(0, 8); // Display top 8 on home with button to view all 34
+  }).slice(0, 8); // Display top 8 on home with button to view all
 
   const familyTabs = [
     { id: 'all', label: 'كافة العائلات' },
@@ -69,7 +70,7 @@ export default function Home() {
     {
       question: 'ما هي وسائل الدفع المقبولة في المتجر؟',
       answer:
-        'نقبل جميع وسائل الدفع الإلكترونية المحلية في مصر: محفظة فودافون كاش (01034027398)، تطبيق InstaPay للتحويل اللحظي المجاني، محفظة اتصالات كاش، ومحفظة أورنج كاش.',
+        'نقبل جميع وسائل الدفع الإلكترونية المحلية في مصر: محفظة فودافون كاش، تطبيق InstaPay للتحويل اللحظي المجاني، محفظة اتصالات كاش، ومحفظة أورنج كاش. تظهر بيانات الحساب المعتمدة مباشرة في صفحة الدفع الخاصة بكل طلب.',
     },
     {
       question: 'ما هي الشروط المطبقة على هدية التسجيل لأول مرة؟',
@@ -104,7 +105,7 @@ export default function Home() {
               </h1>
 
               <p className="text-base sm:text-lg text-[#cbbae7] max-w-2xl leading-relaxed">
-                اشترك وجدد باقات الإنترنت المنزلي لسعات تبدأ من 50 جيجابايت حتى 18 تيرابايت. ادفع فورياً عبر فودافون كاش وتطبيق إنستاباي مع متابعة حية لحالة الشحن على خطك.
+                اشترك وجدد باقات الإنترنت المنزلي لسعات تبدأ من {cheapestPlan.quota_value} جيجابايت حتى 18 تيرابايت. ادفع فورياً عبر فودافون كاش وتطبيق إنستاباي مع متابعة حية لحالة الشحن على خطك.
               </p>
 
               {/* Action Buttons */}
@@ -143,7 +144,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2 text-[#E9E0F5]">
                   <CheckIcon size={16} className="text-[#B9F03C] shrink-0" />
-                  <span>دعم مباشر واتساب</span>
+                  <span>دعم فني وتذاكر فورية</span>
                 </div>
               </div>
             </div>
@@ -208,7 +209,7 @@ export default function Home() {
                 اختر الباقة المناسبة لاستخدامك
               </h2>
               <p className="text-sm text-[#5E5873] mt-1">
-                سعات تبدأ من 50 جيجابايت حتى 18 تيرابايت لجميع الاستخدامات المنزلية.
+                سعات تبدأ من {cheapestPlan.quota_value} جيجابايت بسعر يبدأ من {cheapestPlan.price_egp} ج.م حتى 18 تيرابايت لجميع الاستخدامات المنزلية.
               </p>
             </div>
 
@@ -247,7 +248,7 @@ export default function Home() {
           <div className="mt-12 text-center">
             <Link href="/plans">
               <Button variant="outline" size="lg" rightIcon={<ArrowLeftRTL size={18} />}>
-                عرض كافة الباقات (34 باقة معتمدة)
+                عرض كافة الباقات ({SEED_PLANS.length} باقة معتمدة)
               </Button>
             </Link>
           </div>
@@ -380,7 +381,7 @@ export default function Home() {
                 <ZapIcon size={26} />
               </div>
               <h3 className="font-heading font-bold text-base text-[#14101F] mb-2">
-                دعم فني عبر واتساب
+                دعم فني وتذاكر فورية
               </h3>
               <p className="text-xs text-[#5E5873] leading-relaxed">
                 فريق خدمة عملاء متواجد يومياً لمساعدتك والإجابة على أي استفسارات تخص خطك.

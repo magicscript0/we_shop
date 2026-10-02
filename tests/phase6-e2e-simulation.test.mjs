@@ -6,56 +6,55 @@ import { calculateServerDiscount, DEFAULT_WELCOME_CAMPAIGN } from '../src/lib/se
 
 const SEED_PLANS = [
   // Super Monthly
-  { id: '1', slug: 'super-monthly-50gb', tier: 'Super', billing_period: 'monthly', quota_value: 50, quota_unit: 'GB', price_egp: 150, speed_mbps: null, tier_note_raw: '3' },
-  { id: '2', slug: 'super-monthly-200gb', tier: 'Super', billing_period: 'monthly', quota_value: 200, quota_unit: 'GB', price_egp: 330, speed_mbps: null, tier_note_raw: '3' },
-  { id: '3', slug: 'super-monthly-250gb', tier: 'Super', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 395, speed_mbps: null, tier_note_raw: '3' },
-  { id: '4', slug: 'super-monthly-300gb', tier: 'Super', billing_period: 'monthly', quota_value: 300, quota_unit: 'GB', price_egp: 460, speed_mbps: null, tier_note_raw: '3' },
-  { id: '5', slug: 'super-monthly-400gb', tier: 'Super', billing_period: 'monthly', quota_value: 400, quota_unit: 'GB', price_egp: 580, speed_mbps: null, tier_note_raw: '3' },
-  { id: '6', slug: 'super-monthly-500gb', tier: 'Super', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 660, speed_mbps: null, tier_note_raw: '3' },
-  { id: '7', slug: 'super-monthly-750gb', tier: 'Super', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 925, speed_mbps: null, tier_note_raw: '3' },
-  { id: '8', slug: 'super-monthly-1500gb', tier: 'Super', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 1650, speed_mbps: null, tier_note_raw: '3' },
+  { id: '1', slug: 'super-monthly-200gb', tier: 'Super', billing_period: 'monthly', quota_value: 200, quota_unit: 'GB', price_egp: 330, speed_mbps: null, tier_note_raw: '3' },
+  { id: '2', slug: 'super-monthly-250gb', tier: 'Super', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 395, speed_mbps: null, tier_note_raw: '3' },
+  { id: '3', slug: 'super-monthly-300gb', tier: 'Super', billing_period: 'monthly', quota_value: 300, quota_unit: 'GB', price_egp: 460, speed_mbps: null, tier_note_raw: '3' },
+  { id: '4', slug: 'super-monthly-400gb', tier: 'Super', billing_period: 'monthly', quota_value: 400, quota_unit: 'GB', price_egp: 580, speed_mbps: null, tier_note_raw: '3' },
+  { id: '5', slug: 'super-monthly-500gb', tier: 'Super', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 660, speed_mbps: null, tier_note_raw: '3' },
+  { id: '6', slug: 'super-monthly-750gb', tier: 'Super', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 925, speed_mbps: null, tier_note_raw: '3' },
+  { id: '7', slug: 'super-monthly-1500gb', tier: 'Super', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 1650, speed_mbps: null, tier_note_raw: '3' },
 
   // Super Yearly
-  { id: '9', slug: 'super-yearly-1800gb', tier: 'Super', billing_period: 'yearly', quota_value: 1800, quota_unit: 'GB', price_egp: 3120, speed_mbps: null, tier_note_raw: '3' },
-  { id: '10', slug: 'super-yearly-2400gb', tier: 'Super', billing_period: 'yearly', quota_value: 2400, quota_unit: 'GB', price_egp: 3960, speed_mbps: null, tier_note_raw: '3' },
-  { id: '11', slug: 'super-yearly-3000gb', tier: 'Super', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 4345, speed_mbps: null, tier_note_raw: '3' },
-  { id: '12', slug: 'super-yearly-3600gb', tier: 'Super', billing_period: 'yearly', quota_value: 3600, quota_unit: 'GB', price_egp: 5060, speed_mbps: null, tier_note_raw: '3' },
-  { id: '13', slug: 'super-yearly-4800gb', tier: 'Super', billing_period: 'yearly', quota_value: 4800, quota_unit: 'GB', price_egp: 6380, speed_mbps: null, tier_note_raw: '3' },
-  { id: '14', slug: 'super-yearly-6000gb', tier: 'Super', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 6930, speed_mbps: null, tier_note_raw: '3' },
-  { id: '15', slug: 'super-yearly-9000gb', tier: 'Super', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 9715, speed_mbps: null, tier_note_raw: '3' },
-  { id: '16', slug: 'super-yearly-18tb', tier: 'Super', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 16500, speed_mbps: null, tier_note_raw: '3' },
+  { id: '8', slug: 'super-yearly-1800gb', tier: 'Super', billing_period: 'yearly', quota_value: 1800, quota_unit: 'GB', price_egp: 3120, speed_mbps: null, tier_note_raw: '3' },
+  { id: '9', slug: 'super-yearly-2400gb', tier: 'Super', billing_period: 'yearly', quota_value: 2400, quota_unit: 'GB', price_egp: 3960, speed_mbps: null, tier_note_raw: '3' },
+  { id: '10', slug: 'super-yearly-3000gb', tier: 'Super', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 4345, speed_mbps: null, tier_note_raw: '3' },
+  { id: '11', slug: 'super-yearly-3600gb', tier: 'Super', billing_period: 'yearly', quota_value: 3600, quota_unit: 'GB', price_egp: 5060, speed_mbps: null, tier_note_raw: '3' },
+  { id: '12', slug: 'super-yearly-4800gb', tier: 'Super', billing_period: 'yearly', quota_value: 4800, quota_unit: 'GB', price_egp: 6380, speed_mbps: null, tier_note_raw: '3' },
+  { id: '13', slug: 'super-yearly-6000gb', tier: 'Super', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 6930, speed_mbps: null, tier_note_raw: '3' },
+  { id: '14', slug: 'super-yearly-9000gb', tier: 'Super', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 9715, speed_mbps: null, tier_note_raw: '3' },
+  { id: '15', slug: 'super-yearly-18tb', tier: 'Super', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 16500, speed_mbps: null, tier_note_raw: '3' },
 
   // Mega Monthly
-  { id: '17', slug: 'mega-monthly-250gb', tier: 'Mega', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 590, speed_mbps: null, tier_note_raw: '2' },
-  { id: '18', slug: 'mega-monthly-500gb', tier: 'Mega', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 900, speed_mbps: null, tier_note_raw: '2' },
-  { id: '19', slug: 'mega-monthly-750gb', tier: 'Mega', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1175, speed_mbps: null, tier_note_raw: '2' },
-  { id: '20', slug: 'mega-monthly-1500gb', tier: 'Mega', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2000, speed_mbps: null, tier_note_raw: '2' },
+  { id: '16', slug: 'mega-monthly-250gb', tier: 'Mega', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 590, speed_mbps: null, tier_note_raw: '2' },
+  { id: '17', slug: 'mega-monthly-500gb', tier: 'Mega', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 900, speed_mbps: null, tier_note_raw: '2' },
+  { id: '18', slug: 'mega-monthly-750gb', tier: 'Mega', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1175, speed_mbps: null, tier_note_raw: '2' },
+  { id: '19', slug: 'mega-monthly-1500gb', tier: 'Mega', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2000, speed_mbps: null, tier_note_raw: '2' },
 
   // Mega Yearly
-  { id: '21', slug: 'mega-yearly-3000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 6490, speed_mbps: null, tier_note_raw: '2' },
-  { id: '22', slug: 'mega-yearly-6000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 9450, speed_mbps: null, tier_note_raw: '2' },
-  { id: '23', slug: 'mega-yearly-9000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 12340, speed_mbps: null, tier_note_raw: '2' },
-  { id: '24', slug: 'mega-yearly-18tb', tier: 'Mega', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 20000, speed_mbps: null, tier_note_raw: '2' },
+  { id: '20', slug: 'mega-yearly-3000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 6490, speed_mbps: null, tier_note_raw: '2' },
+  { id: '21', slug: 'mega-yearly-6000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 9450, speed_mbps: null, tier_note_raw: '2' },
+  { id: '22', slug: 'mega-yearly-9000gb', tier: 'Mega', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 12340, speed_mbps: null, tier_note_raw: '2' },
+  { id: '23', slug: 'mega-yearly-18tb', tier: 'Mega', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 20000, speed_mbps: null, tier_note_raw: '2' },
 
   // Ultra Monthly
-  { id: '25', slug: 'ultra-monthly-250gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 785, speed_mbps: null, tier_note_raw: '2' },
-  { id: '26', slug: 'ultra-monthly-500gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 1150, speed_mbps: null, tier_note_raw: '2' },
-  { id: '27', slug: 'ultra-monthly-750gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1425, speed_mbps: null, tier_note_raw: '2' },
+  { id: '24', slug: 'ultra-monthly-250gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 250, quota_unit: 'GB', price_egp: 785, speed_mbps: null, tier_note_raw: '2' },
+  { id: '25', slug: 'ultra-monthly-500gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 500, quota_unit: 'GB', price_egp: 1150, speed_mbps: null, tier_note_raw: '2' },
+  { id: '26', slug: 'ultra-monthly-750gb', tier: 'Ultra', billing_period: 'monthly', quota_value: 750, quota_unit: 'GB', price_egp: 1425, speed_mbps: null, tier_note_raw: '2' },
 
   // Ultra Yearly
-  { id: '28', slug: 'ultra-yearly-3000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 8635, speed_mbps: null, tier_note_raw: '2' },
-  { id: '29', slug: 'ultra-yearly-6000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 12075, speed_mbps: null, tier_note_raw: '2' },
-  { id: '30', slug: 'ultra-yearly-9000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 14965, speed_mbps: null, tier_note_raw: '2' },
+  { id: '27', slug: 'ultra-yearly-3000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 3000, quota_unit: 'GB', price_egp: 8635, speed_mbps: null, tier_note_raw: '2' },
+  { id: '28', slug: 'ultra-yearly-6000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 6000, quota_unit: 'GB', price_egp: 12075, speed_mbps: null, tier_note_raw: '2' },
+  { id: '29', slug: 'ultra-yearly-9000gb', tier: 'Ultra', billing_period: 'yearly', quota_value: 9000, quota_unit: 'GB', price_egp: 14965, speed_mbps: null, tier_note_raw: '2' },
 
   // Max Monthly
-  { id: '31', slug: 'max-monthly-1500gb', tier: 'Max', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2350, speed_mbps: null, tier_note_raw: '2' },
-  { id: '32', slug: 'max-plus-monthly-1500gb', tier: 'Max Plus', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2700, speed_mbps: null, tier_note_raw: '2' },
+  { id: '30', slug: 'max-monthly-1500gb', tier: 'Max', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2350, speed_mbps: null, tier_note_raw: '2' },
+  { id: '31', slug: 'max-plus-monthly-1500gb', tier: 'Max Plus', billing_period: 'monthly', quota_value: 1500, quota_unit: 'GB', price_egp: 2700, speed_mbps: null, tier_note_raw: '2' },
 
   // Max Yearly
-  { id: '33', slug: 'max-yearly-18tb', tier: 'Max', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 23500, speed_mbps: null, tier_note_raw: '2' },
+  { id: '32', slug: 'max-yearly-18tb', tier: 'Max', billing_period: 'yearly', quota_value: 18, quota_unit: 'TB', price_egp: 23500, speed_mbps: null, tier_note_raw: '2' },
 
   // Elite (other)
-  { id: '34', slug: 'elite-3tb', tier: 'Elite', billing_period: 'other', quota_value: 3, quota_unit: 'TB', price_egp: 3500, speed_mbps: null, tier_note_raw: '3 TB' },
+  { id: '33', slug: 'elite-3tb', tier: 'Elite', billing_period: 'other', quota_value: 3, quota_unit: 'TB', price_egp: 3500, speed_mbps: null, tier_note_raw: '3 TB' },
 ];
 
 describe('Phase 6: End-to-End Real-World Simulation & System Verification', () => {
@@ -320,11 +319,12 @@ describe('Phase 6: End-to-End Real-World Simulation & System Verification', () =
     // 1. Destination payment account matches specs
     assert.strictEqual(VODAFONE_CASH_NUMBER, '01034027398');
 
-    // 2. All 34 catalog plans have speed_mbps null
+    // 2. All 33 catalog plans have speed_mbps null
     const nonNullSpeeds = SEED_PLANS.filter((p) => p.speed_mbps !== null);
     assert.strictEqual(nonNullSpeeds.length, 0, 'No plan may have speed_mbps claimed by default');
 
-    // 3. Exactly 34 plans in catalog
-    assert.strictEqual(SEED_PLANS.length, 34);
+    // 3. Exactly 33 plans in catalog (50GB removed)
+    assert.strictEqual(SEED_PLANS.length, 33);
+    assert.strictEqual(SEED_PLANS.some((p) => p.slug === 'super-monthly-50gb'), false);
   });
 });

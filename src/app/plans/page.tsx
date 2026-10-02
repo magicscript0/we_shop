@@ -6,13 +6,14 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { PlanCard } from '@/components/plans/PlanCard';
 import { Button, Input, Badge } from '@/components/ui';
-import { SEED_PLANS } from '@/lib/constants';
+import { SEED_PLANS, getCheapestActivePlan } from '@/lib/constants';
 import { PlanTier, BillingPeriod, Plan } from '@/types/database';
 import { ArrowLeftRTL, ZapIcon } from '@/components/ui/Icons';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'quota-desc' | 'quota-asc';
 
 export default function PlansPage() {
+  const cheapestPlan = getCheapestActivePlan();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
@@ -106,7 +107,7 @@ export default function PlansPage() {
               باقات WE للإنترنت المنزلي
             </h1>
             <p className="text-xs sm:text-sm text-[#cbbae7] max-w-2xl leading-relaxed">
-              تصفح وقارن بين كافة الباقات المعتمدة (34 باقة رسمية) لسعات تبدأ من 50 جيجابايت حتى 18 تيرابايت.
+              تصفح وقارن بين كافة الباقات المعتمدة ({SEED_PLANS.length} باقة رسمية) لسعات تبدأ من {cheapestPlan.quota_value} جيجابايت حتى 18 تيرابايت.
             </p>
           </div>
         </section>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SEED_PLANS, SEED_PAYMENT_METHODS } from '@/lib/constants';
 import { calculateServerDiscount } from '@/lib/services/discount';
+import { calculatePlanPricing } from '@/lib/services/pricing';
 import { isValidWeLineNumber, isValidEgyptianMobile, generateOrderNumber, calculateOrderExpiry } from '@/lib/utils';
 import { Order, OrderStatus } from '@/types/database';
 
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Server-Side Discount Calculation (Never trust client prices - Section 9 & 14)
+    // 4. Server-Side Pricing Engine with VAT (Change 2)
     const discountResult = calculateServerDiscount({
       userId,
       userCreatedAt: isNewCustomer ? new Date().toISOString() : undefined,
@@ -54,6 +55,18 @@ export async function POST(request: Request) {
       customerPhone: customerPhone.trim(),
       plan,
     });
+
+    const pricing = calculatePlanPricing(
+      plan.price_egp,
+      discountResult.isEligible
+        ? {
+            percent: discountResult.percent,
+            max_discount_amount: null,
+            is_eligible: true,
+            name_ar: 'خصم الترحيب 50%',
+          }
+        : null
+    );
 
     // 5. Server-Enforced Expiry: strictly 60 minutes from now (Section 10.2)
     const expiryDate = calculateOrderExpiry(60);
@@ -73,9 +86,14 @@ export async function POST(request: Request) {
       we_line_number: weLineNumber.trim(),
       line_governorate_code: governorateCode,
       customer_phone: customerPhone.trim(),
-      price_original: discountResult.originalPrice,
-      discount_amount: discountResult.discountAmount,
-      price_final: discountResult.finalPrice,
+      price_original: pricing.base_price,
+      discount_amount: pricing.discount_amount,
+      net_amount: pricing.net_amount,
+      vat_rate: pricing.vat_rate,
+      vat_amount: pricing.vat_amount,
+      rounding_adjustment: pricing.rounding_adjustment,
+      total_due: pricing.total_due,
+      price_final: pricing.total_due, // Total amount to transfer
       campaign_id: discountResult.campaignId || null,
       plan_snapshot: {
         tier: plan.tier,
@@ -86,6 +104,13 @@ export async function POST(request: Request) {
         price_egp: plan.price_egp,
         slug: plan.slug,
       },
+      offer_snapshot: discountResult.isEligible
+        ? {
+            percent: discountResult.percent,
+            max_discount_amount: null,
+            name_ar: 'خصم الترحيب 50%',
+          }
+        : null,
       expires_at: expiryDate.toISOString(),
       payment_method_id: paymentMethod.id,
       created_at: new Date().toISOString(),
