@@ -4,12 +4,19 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui';
 import { ShieldCheckIcon, RouterIcon } from '@/components/ui/Icons';
+import { AnnouncementBar } from '@/components/offer/AnnouncementBar';
+import { OfferTermsModal } from '@/components/offer/OfferTermsModal';
+import { MobileStickyOfferBar } from '@/components/offer/MobileStickyOfferBar';
 
 export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB]">
+    <>
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB]">
+        {/* Top Dismissible Announcement Bar (Change 3) */}
+        <AnnouncementBar onOpenTerms={() => setTermsModalOpen(true)} />
       {/* Top Authorized Agent Notice Bar */}
       <div className="bg-[#2A1250] text-white py-1 px-4 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -153,5 +160,12 @@ export const Header: React.FC = () => {
         </div>
       )}
     </header>
-  );
+
+    {/* Mobile Sticky Bottom Offer Bar (Change 3) */}
+    <MobileStickyOfferBar />
+
+    {/* Transparent Offer Terms Modal (Change 3) */}
+    <OfferTermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
+  </>
+);
 };

@@ -32,13 +32,13 @@ export const DEFAULT_WELCOME_CAMPAIGN: Campaign = {
   slug: 'welcome-50-percent',
   name_ar: 'خصم الترحيب 50% للعملاء الجدد',
   percent: 50,
-  max_discount_amount: null, // null means no cap (shows admin warning in dashboard)
+  max_discount_amount: 350, // 350 EGP ceiling (Change 3)
   claim_window_days: 7,
   starts_at: new Date('2026-01-01').toISOString(),
   ends_at: null,
   is_active: true,
   eligible_plan_ids: null, // all plans
-  exclude_yearly: false,
+  exclude_yearly: true, // Monthly plans only (Change 3)
 };
 
 /**

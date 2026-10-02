@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       discountResult.isEligible
         ? {
             percent: discountResult.percent,
-            max_discount_amount: null,
+            max_discount_amount: 350,
             is_eligible: true,
             name_ar: 'خصم الترحيب 50%',
           }

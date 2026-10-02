@@ -11,6 +11,8 @@ import { PlanCard } from '@/components/plans/PlanCard';
 import { Button, Tabs, Badge } from '@/components/ui';
 import { SEED_PLANS, getCheapestActivePlan } from '@/lib/constants';
 import { BillingPeriod } from '@/types/database';
+import { HeroOfferSeal } from '@/components/offer/HeroOfferSeal';
+import { OfferTermsModal } from '@/components/offer/OfferTermsModal';
 import {
   ShieldCheckIcon,
   ZapIcon,
@@ -24,6 +26,7 @@ import {
 
 export default function Home() {
   const cheapestPlan = getCheapestActivePlan();
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<BillingPeriod>('monthly');
 
@@ -147,6 +150,11 @@ export default function Home() {
                   <span>دعم فني وتذاكر فورية</span>
                 </div>
               </div>
+
+              {/* The Hero Welcome Offer Seal (Change 3) */}
+              <div className="pt-2">
+                <HeroOfferSeal onOpenTerms={() => setTermsModalOpen(true)} />
+              </div>
             </div>
 
             {/* Left Column: The 3D / Orbit Visual */}
@@ -159,38 +167,47 @@ export default function Home() {
         {/* 2. Quick Actions Bar */}
         <QuickActions />
 
-        {/* 3. The Surprise Teaser Section (Section 9: Hidden until sign-up) */}
+        {/* 3. Public, Loud & Honest 50% Welcome Offer Section (Change 3) */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2A1250] to-[#4A2480] text-white p-8 sm:p-10 border border-[#A98BD6]/30 shadow-xl">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-[#FF7A1A]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2A1250] via-[#4A2480] to-[#2A1250] text-white p-8 sm:p-10 border border-[#B9F03C]/30 shadow-xl">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-[#B9F03C]/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-[#FF7A1A] text-white flex items-center justify-center shadow-lg shadow-[#FF7A1A]/30 shrink-0">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="flex items-start sm:items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-[#B9F03C] text-[#1B0A33] flex items-center justify-center shadow-lg shadow-[#B9F03C]/20 shrink-0 font-extrabold">
                   <GiftIcon size={34} />
                 </div>
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FF7A1A]/20 text-[#FF7A1A] text-xs font-bold mb-1.5">
-                    <span>مفاجأة خاصة بالعملاء الجدد</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B9F03C]/20 text-[#B9F03C] text-xs font-bold mb-2">
+                    <span>عرض ترحيبي معلن وشفاف</span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold font-heading">
-                    هدية استثنائية بانتظارك بمجرد إنشاء حسابك!
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold font-heading">
+                    خصم 50% فوري لأول اشتراك (سقف 350 ج.م)
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#cbbae7] mt-1 max-w-xl">
-                    سجل حسابك الآن لتكتشف العرض الحصري المطبق تلقائياً على أول اشتراك لك لمرة واحدة لكل خط أرضي.
+                  <p className="text-xs sm:text-sm text-[#cbbae7] mt-1.5 max-w-2xl leading-relaxed">
+                    وفر نصف تكلفة باقتك الشهرية الأولى بدون شروط خفية أو تعقيدات. يطبق الخصم تلقائياً عند أول سداد، صالح لمدة 7 أيام من التسجيل، لمرة واحدة لكل خط أرضي ومحمول.
                   </p>
                 </div>
               </div>
 
-              <Link href="/auth/signup" className="shrink-0">
-                <Button
-                  variant="discount"
-                  size="lg"
-                  rightIcon={<ArrowLeftRTL size={18} />}
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setTermsModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl border border-white/30 text-white hover:bg-white/10 text-xs font-bold transition-colors cursor-pointer"
                 >
-                  سجل واكتشف المفاجأة
-                </Button>
-              </Link>
+                  شروط وضوابط العرض
+                </button>
+                <Link href="/plans">
+                  <Button
+                    variant="discount"
+                    size="lg"
+                    rightIcon={<ArrowLeftRTL size={18} />}
+                  >
+                    تصفح الباقات بخصم 50%
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -408,6 +425,9 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      {/* Offer Terms Modal (Change 3) */}
+      <OfferTermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
     </div>
   );
 }

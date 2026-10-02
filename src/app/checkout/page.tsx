@@ -10,7 +10,8 @@ import { SEED_PLANS, SEED_PAYMENT_METHODS, GOVERNORATE_CODES } from '@/lib/const
 import { isValidWeLineNumber, isValidEgyptianMobile, formatEgp } from '@/lib/utils';
 import { calculateServerDiscount } from '@/lib/services/discount';
 import { calculatePlanPricing, formatPriceEgp } from '@/lib/services/pricing';
-import { ShieldCheckIcon, WalletIcon, ArrowLeftRTL, CheckIcon, AlertTriangleIcon } from '@/components/ui/Icons';
+import { ShieldCheckIcon, WalletIcon, ArrowLeftRTL, CheckIcon, AlertTriangleIcon, GiftIcon } from '@/components/ui/Icons';
+import { OfferTermsModal } from '@/components/offer/OfferTermsModal';
 import { Plan } from '@/types/database';
 
 function CheckoutContent() {
@@ -33,6 +34,7 @@ function CheckoutContent() {
   const [customerName, setCustomerName] = useState('');
   const [selectedMethodKey, setSelectedMethodKey] = useState('vodafone_cash');
   const [agreeTerms, setAgreeTerms] = useState(true);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -296,14 +298,61 @@ function CheckoutContent() {
               />
             </div>
 
-            {/* Price Calculations Breakdown (Change 2) */}
+            {/* Welcome Offer Reservation Banner (Change 3) */}
+            {discountCalculation.isEligible ? (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#F6F2FC] to-purple-50 border border-emerald-200/80 shadow-sm text-right space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    تم تطبيق العرض الترحيبي (خصم 50%)
+                  </span>
+                  <span className="text-[11px] font-extrabold text-emerald-700 bg-white px-2 py-0.5 rounded-lg border border-emerald-200">
+                    وفر حتى 350 ج.م
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#5E5873] leading-relaxed">
+                  هذا العرض الترحيبي محجوز لطلبك لمدة <strong>60 دقيقة</strong> من لحظة الانتقال لبوابة الدفع.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className="text-[11px] text-[#5C2D91] underline font-semibold hover:text-[#4A2475] inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <GiftIcon size={12} />
+                  <span>اطّلع على الشروط والأحكام الكاملة للخصم</span>
+                </button>
+              </div>
+            ) : selectedPlan.billing_period === 'yearly' ? (
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-right space-y-1 text-xs text-amber-900">
+                <div className="font-bold flex items-center gap-1.5">
+                  <AlertTriangleIcon size={15} className="text-amber-600 shrink-0" />
+                  <span>الباقات السنوية غير مشمولة في خصم الترحيب (50%)</span>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  هذه الباقة سنوية وتتضمن بالفعل وفراً وخصماً سنوياً مدمجاً. يسري الخصم الترحيبي 50% على الباقات الشهرية فقط.
+                </p>
+              </div>
+            ) : discountCalculation.reasonAr ? (
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-right text-xs text-rose-800 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <AlertTriangleIcon size={14} className="text-rose-600 shrink-0" />
+                  <span>تنبيه بشأن الخصم الترحيبي:</span>
+                </div>
+                <p className="text-[11px] text-rose-700">{discountCalculation.reasonAr}</p>
+              </div>
+            ) : null}
+
+            {/* Price Calculations Breakdown (Change 2 & Change 3) */}
             {(() => {
               const pricing = calculatePlanPricing(
                 selectedPlan.price_egp,
                 discountCalculation.isEligible
                   ? {
                       percent: discountCalculation.percent,
-                      max_discount_amount: null,
+                      max_discount_amount: 350,
                       is_eligible: true,
                       name_ar: 'خصم الترحيب 50%',
                     }
@@ -320,11 +369,16 @@ function CheckoutContent() {
                   </div>
 
                   {pricing.has_offer && (
-                    <div className="flex items-center justify-between text-[#FF7A1A] font-semibold bg-[#FFF2EA] p-2.5 rounded-xl border border-[#FFD2B3]">
+                    <div className="flex items-center justify-between text-emerald-800 font-semibold bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
                       <div className="flex items-center gap-1.5">
                         <span>خصم الترحيب للعملاء الجدد (50%):</span>
+                        {pricing.discount_amount >= 350 && (
+                          <span className="text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
+                            الحد الأقصى (350 ج.م)
+                          </span>
+                        )}
                       </div>
-                      <span className="font-bold tabular-nums text-sm">
+                      <span className="font-bold tabular-nums text-sm text-emerald-800">
                         − {pricing.formatted_discount}
                       </span>
                     </div>
@@ -400,6 +454,9 @@ function CheckoutContent() {
           </div>
         </div>
       </form>
+
+      {/* Transparent Terms Modal */}
+      <OfferTermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </div>
   );
 }

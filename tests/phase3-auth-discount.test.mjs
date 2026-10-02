@@ -62,6 +62,7 @@ describe('Phase 3: Auth & Welcome Discount Abuse Prevention Tests', () => {
       const customCampaign = {
         ...DEFAULT_WELCOME_CAMPAIGN,
         max_discount_amount: 1000,
+        exclude_yearly: false,
       };
 
       const result = calculateServerDiscount({

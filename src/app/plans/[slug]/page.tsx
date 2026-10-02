@@ -98,13 +98,20 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {/* Pricing Breakdown Card (Change 2.3) */}
+              {/* Pricing Breakdown Card (Change 2.3 & Change 3) */}
               {(() => {
-                const pricing = calculatePlanPricing(plan.price_egp, {
-                  percent: 50,
-                  is_eligible: true,
-                  name_ar: 'خصم الترحيب 50%',
-                });
+                const isMonthly = plan.billing_period === 'monthly';
+                const pricing = calculatePlanPricing(
+                  plan.price_egp,
+                  isMonthly
+                    ? {
+                        percent: 50,
+                        max_discount_amount: 350,
+                        is_eligible: true,
+                        name_ar: 'خصم الترحيب 50%',
+                      }
+                    : null
+                );
 
                 return (
                   <div className="p-6 rounded-2xl bg-[#F8F9FA] border-2 border-[#E9E0F5] space-y-4">
@@ -115,10 +122,12 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm text-[#FF7A1A] font-semibold">
-                      <span>خصم الترحيب للعملاء الجدد (−50%)</span>
-                      <span className="tabular-nums">− {pricing.formatted_discount}</span>
-                    </div>
+                    {isMonthly && (
+                      <div className="flex items-center justify-between text-sm text-[#FF7A1A] font-semibold">
+                        <span>خصم الترحيب للعملاء الجدد (−50% بحد أقصى 350 ج.م)</span>
+                        <span className="tabular-nums">− {pricing.formatted_discount}</span>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between text-sm text-[#5E5873]">
                       <span>ضريبة القيمة المضافة القانونية (14%)</span>
@@ -139,21 +148,27 @@ export default async function PlanDetailsPage({ params }: PageProps) {
                           الإجمالي المستحق بعد الضريبة
                         </span>
                         <span className="text-[11px] text-[#5E5873]">
-                          المبلغ الفعلي المطلوب تحويله لتفعيل الخط فورياً
+                          {isMonthly
+                            ? 'سعر أول شهر للمشترك الجديد شامل 14% ضريبة'
+                            : 'المبلغ المطلوب سداده للاشتراك السنوي شامل 14% ضريبة'}
                         </span>
                       </div>
                       <div className="text-right">
                         <span className="text-3xl sm:text-4xl font-extrabold font-heading text-[#5C2D91] tabular-nums block">
                           {pricing.formatted_total_due}
                         </span>
-                        <span className="text-[11px] text-[#8E8A9F] line-through tabular-nums">
-                          بدون العرض: {calculatePlanPricing(plan.price_egp).formatted_total_due}
-                        </span>
+                        {isMonthly && (
+                          <span className="text-[11px] text-[#8E8A9F] line-through tabular-nums">
+                            التجديد الشهري: {calculatePlanPricing(plan.price_egp).formatted_total_due}
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     <p className="text-[11px] text-[#8E8A9F] text-center">
-                      * العرض الترحيبي سارٍ لأول طلب للعميل الجديد ولمرة واحدة لكل خط أرضي.
+                      {isMonthly
+                        ? '* العرض الترحيبي (50% حتى 350 ج.م) سارٍ لأول طلب للعميل الجديد ولمرة واحدة لكل خط أرضي.'
+                        : '* باقة سنوية تتمتع بخصم سنوي خاص (معفاة من عرض الترحيب).'}
                     </p>
                   </div>
                 );
