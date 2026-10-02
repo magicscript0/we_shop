@@ -26,15 +26,41 @@ export default function AccountPage() {
   const [newLineNumber, setNewLineNumber] = useState('');
   const [lineAddError, setLineAddError] = useState<string | null>(null);
 
-  // Sample Customer Data (demonstrated in UI)
+  // Authenticated user state
+  const [authUser, setAuthUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        setAuthUser(data.user);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const user = {
-    name: 'أحمد محمود',
-    email: 'ahmed@example.com',
-    phone: '01012345678',
+    name:
+      authUser?.user_metadata?.full_name ||
+      authUser?.user_metadata?.name ||
+      authUser?.email?.split('@')[0] ||
+      'عميل متجر وي',
+    email: authUser?.email || 'غير مسجل',
+    phone: authUser?.user_metadata?.phone_number || authUser?.phone || 'غير مسجل',
     role: 'customer',
     hasWelcomeDiscount: true,
     discountDaysLeft: 6,
+    avatarUrl: authUser?.user_metadata?.avatar_url || authUser?.user_metadata?.picture || null,
   };
+
 
   const orders = [
     {
@@ -108,9 +134,18 @@ export default function AccountPage() {
           {/* Profile Header Card */}
           <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-right">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#2A1250] to-[#5C2D91] text-[#B9F03C] flex items-center justify-center font-heading font-extrabold text-2xl shadow-md shrink-0">
-                {user.name.slice(0, 1)}
-              </div>
+              {user.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="w-16 h-16 rounded-2xl object-cover shadow-md shrink-0 border-2 border-[#5C2D91]"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#2A1250] to-[#5C2D91] text-[#B9F03C] flex items-center justify-center font-heading font-extrabold text-2xl shadow-md shrink-0">
+                  {user.name.slice(0, 1)}
+                </div>
+              )}
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-[#14101F]">
