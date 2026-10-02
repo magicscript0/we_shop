@@ -99,9 +99,10 @@ export interface Order {
   } | null;
   expires_at: string;
   payment_method_id: string | null;
+  proof_data?: { transaction_ref?: string; sender_ref?: string; amount_sent?: number; [key: string]: unknown } | null;
   internal_notes?: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface PaymentProof {

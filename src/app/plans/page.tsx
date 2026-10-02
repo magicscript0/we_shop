@@ -9,11 +9,14 @@ import { Button, Input, Badge } from '@/components/ui';
 import { SEED_PLANS, getCheapestActivePlan } from '@/lib/constants';
 import { PlanTier, BillingPeriod, Plan } from '@/types/database';
 import { ArrowLeftRTL, ZapIcon } from '@/components/ui/Icons';
+import { RealTrustMetrics } from '@/components/common/RealTrustMetrics';
+import { PlanFinder } from '@/components/plans/PlanFinder';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'quota-desc' | 'quota-asc';
 
 export default function PlansPage() {
   const cheapestPlan = getCheapestActivePlan();
+  const [showPlanFinder, setShowPlanFinder] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
@@ -112,8 +115,42 @@ export default function PlansPage() {
           </div>
         </section>
 
+        {/* Plan Finder Interactive Recommendation Tool */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F6F2FC] border border-[#CBBAE7]/60 p-4 sm:p-5 rounded-2xl shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#5C2D91] text-[#B9F03C] flex items-center justify-center font-bold text-lg shrink-0">
+                🎯
+              </div>
+              <div className="text-right">
+                <strong className="text-sm font-heading font-extrabold text-[#2A1250] block">
+                  محتار ومش عارف تختار الباقة الأنسب لاستهلاك بيتك؟
+                </strong>
+                <span className="text-xs text-[#5E5873]">
+                  أجب عن 3 أسئلة في 30 ثانية وسنرشح لك الباقة الأكثر توفيراً وتوافقاً مع سرعتك.
+                </span>
+              </div>
+            </div>
+
+            <Button
+              variant={showPlanFinder ? 'outline' : 'primary'}
+              size="sm"
+              onClick={() => setShowPlanFinder(!showPlanFinder)}
+              className="shrink-0 font-bold"
+            >
+              {showPlanFinder ? 'إخفاء أداة الترشيح ▲' : 'تشغيل مساعد الاختيار 🎯'}
+            </Button>
+          </div>
+
+          {showPlanFinder && (
+            <div className="mt-4 animate-in fade-in duration-200">
+              <PlanFinder />
+            </div>
+          )}
+        </section>
+
         {/* Filter & Control Bar */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
           <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-md p-5 space-y-5">
             {/* Top row: Search input & Sorting */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -278,6 +315,11 @@ export default function PlansPage() {
               </Button>
             </div>
           )}
+        </section>
+
+        {/* Real Trust Metrics Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-8">
+          <RealTrustMetrics variant="banner" />
         </section>
       </main>
 

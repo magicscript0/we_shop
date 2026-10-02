@@ -17,6 +17,7 @@ import {
   ArrowLeftRTL,
 } from '@/components/ui/Icons';
 import { Order, OrderStatus } from '@/types/database';
+import { InvoiceReceiptModal } from '@/components/orders/InvoiceReceiptModal';
 
 export default function OrderDetailsStatusPage() {
   const params = useParams();
@@ -25,6 +26,7 @@ export default function OrderDetailsStatusPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>('proof_submitted');
   const [rejectReason, setRejectReason] = useState<string>('رقم العملية غير مطابق لكشف الحساب الوارد.');
+  const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
 
   useEffect(() => {
     // Try to load from session storage
@@ -183,6 +185,16 @@ export default function OrderDetailsStatusPage() {
                     <p className="text-xs sm:text-sm text-[#5E5873]">
                       يمكنك الآن الاستمتاع بالإنترنت المنزلي بسعة {order?.plan_snapshot?.quota_value} {order?.plan_snapshot?.quota_unit}. شكراً لثقتكم بنا!
                     </p>
+                    <div className="pt-3">
+                      <Button
+                        variant="primary"
+                        size="md"
+                        onClick={() => setShowInvoiceModal(true)}
+                        className="gap-2 shadow-md hover:shadow-lg transition-all"
+                      >
+                        <span>عرض وطباعة الفاتورة الضريبية الرسمية 🖨️</span>
+                      </Button>
+                    </div>
                   </>
                 )}
 
@@ -271,8 +283,17 @@ export default function OrderDetailsStatusPage() {
               </div>
             </div>
 
-            {/* Direct Ticket Support Button */}
+            {/* Direct Ticket Support Button & Actions */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setShowInvoiceModal(true)}
+                className="w-full sm:w-auto gap-2"
+              >
+                <span>طباعة الفاتورة الضريبية 🖨️</span>
+              </Button>
+
               <Link
                 href={`/support?orderId=${encodeURIComponent(order?.order_number || orderId)}`}
                 className="w-full sm:w-auto"
@@ -313,6 +334,14 @@ export default function OrderDetailsStatusPage() {
             </div>
           </div>
         </div>
+
+        {order && (
+          <InvoiceReceiptModal
+            order={order}
+            isOpen={showInvoiceModal}
+            onClose={() => setShowInvoiceModal(false)}
+          />
+        )}
       </main>
 
       <Footer />

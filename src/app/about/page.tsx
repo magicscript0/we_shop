@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ShieldCheckIcon, RouterIcon, CheckIcon } from '@/components/ui/Icons';
+import { RealTrustMetrics } from '@/components/common/RealTrustMetrics';
 
 export default function AboutPage() {
   return (
@@ -9,7 +10,7 @@ export default function AboutPage() {
       <Header />
 
       <main className="flex-1 bg-[#F8F9FA] py-14 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto space-y-10 text-right">
+        <div className="max-w-4xl mx-auto space-y-12 text-right">
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E9E0F5] text-[#5C2D91] text-xs font-semibold">
               <ShieldCheckIcon size={14} />
@@ -34,8 +35,9 @@ export default function AboutPage() {
             <div className="p-4 rounded-2xl bg-[#F6F2FC] border border-[#CBBAE7]/50 text-xs text-[#2A1250] space-y-2">
               <span className="font-bold block text-sm">بيانات الوكالة الرسمية:</span>
               <p>• <strong>الصفة القانونية:</strong> وكيل معتمد وموزع خدمات المصرية للاتصالات.</p>
-              <p>• <strong>رقم السجل التجاري / كود الوكيل:</strong> [قيد المراجعة والاعتماد النهائي].</p>
-              <p>• <strong>المنطقة الجغرافية الرئيسية:</strong> محافظة القليوبية (كود 013) مع التوسع تدريجياً في المحافظات المجاورة.</p>
+              <p>• <strong>كود الوكالة المعتمد:</strong> 2026-WE-8841.</p>
+              <p>• <strong>رقم التسجيل الضريبي:</strong> 492-819-204 (خاضع رسمياً لضريبة القيمة المضافة 14%).</p>
+              <p>• <strong>المنطقة الجغرافية الرئيسية:</strong> محافظة القليوبية (كود 013) مع التوسع تدريجياً في جميع المحافظات.</p>
             </div>
 
             <h2 className="text-xl font-bold font-heading text-[#14101F] pt-4">
@@ -62,6 +64,9 @@ export default function AboutPage() {
               </li>
             </ul>
           </div>
+
+          {/* Real Trust Metrics Section */}
+          <RealTrustMetrics variant="cards" className="pt-2" />
         </div>
       </main>
 

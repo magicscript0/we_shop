@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShieldCheckIcon, RouterIcon, WalletIcon, ClockIcon, ZapIcon } from '@/components/ui/Icons';
+import { CommandPalette } from '@/components/admin/CommandPalette';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -62,6 +63,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* Center / Right Header Info */}
         <div className="flex items-center gap-3">
+          {/* Global Command Palette (Ctrl+K) */}
+          <CommandPalette />
+
           {/* Quick link to verification queue */}
           <Link
             href="/admin/verification"

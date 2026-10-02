@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Input, Button } from '@/components/ui';
 import { ShieldCheckIcon, ClockIcon } from '@/components/ui/Icons';
+import { RealTrustMetrics } from '@/components/common/RealTrustMetrics';
 
 export default function SupportPage() {
   const [name, setName] = useState('');
@@ -143,6 +144,9 @@ export default function SupportPage() {
               )}
             </div>
           </div>
+
+          {/* Real Trust Metrics Compact Bar */}
+          <RealTrustMetrics variant="compact" className="pt-2" />
         </div>
       </main>
 
