@@ -1,13 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ShieldCheckIcon, RouterIcon, WalletIcon, ClockIcon, ZapIcon } from '@/components/ui/Icons';
 import { CommandPalette } from '@/components/admin/CommandPalette';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+}
+
+interface AdminUser {
+  name: string;
+  email: string;
+  role: 'owner' | 'admin' | 'super_admin' | 'verifier' | 'support' | 'auditor';
 }
 
 const NAV_ITEMS = [
@@ -28,7 +34,128 @@ const NAV_ITEMS = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Authentication & Security State
+  const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Do not wrap the login page in the admin shell
+  const isLoginPage = pathname === '/admin/login';
+
+  useEffect(() => {
+    if (isLoginPage) {
+      setAuthState('authenticated');
+      return;
+    }
+
+    let isMounted = true;
+
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'check' }),
+        });
+
+        const data = await res.json();
+
+        if (!isMounted) return;
+
+        if (res.ok && data.authenticated && data.user) {
+          setAdminUser(data.user);
+          setAuthState('authenticated');
+        } else {
+          setAuthState('unauthenticated');
+          const redirectUrl = `/admin/login?next=${encodeURIComponent(pathname || '/admin')}`;
+          router.replace(redirectUrl);
+        }
+      } catch {
+        if (!isMounted) return;
+        setAuthState('unauthenticated');
+        router.replace(`/admin/login?next=${encodeURIComponent(pathname || '/admin')}`);
+      }
+    }
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname, isLoginPage, router]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout' }),
+      });
+    } catch {
+      // ignore
+    }
+    router.replace('/admin/login');
+  };
+
+  // If this is the admin login route, render standalone without shell
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Loading Shield Screen while verifying security token
+  if (authState === 'loading') {
+    return (
+      <div className="min-h-screen bg-[#0E041E] flex flex-col items-center justify-center text-white font-body px-4 text-center" dir="rtl">
+        <div className="relative mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#3A1C6E] to-[#5C2D91] flex items-center justify-center text-[#B9F03C] shadow-xl shadow-purple-950/60 animate-pulse">
+            <RouterIcon size={32} />
+          </div>
+          <div className="absolute -inset-1 rounded-2xl border-2 border-[#B9F03C]/40 animate-ping pointer-events-none" />
+        </div>
+        <h2 className="text-lg font-heading font-extrabold text-white mb-1.5">
+          حارس الأمان والتحقق من الهوية
+        </h2>
+        <p className="text-xs text-[#A98BD6] max-w-sm leading-relaxed mb-4">
+          جاري التحقق من التصريح الأمني وصلاحيات الحساب للوصول إلى لوحة الإدارة...
+        </p>
+        <div className="w-48 h-1 bg-[#1F0A3D] rounded-full overflow-hidden">
+          <div className="w-full h-full bg-[#B9F03C] origin-right animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  // Unauthenticated fallback while redirecting
+  if (authState === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-[#0E041E] flex flex-col items-center justify-center text-white font-body px-4 text-center" dir="rtl">
+        <div className="w-12 h-12 rounded-xl bg-red-950/50 border border-red-500/30 text-red-400 flex items-center justify-center mb-4 text-xl">
+          🔒
+        </div>
+        <h2 className="text-base font-heading font-bold text-white mb-1">
+          منطقة محمية وغير مصرح بالدخول
+        </h2>
+        <p className="text-xs text-[#A98BD6] mb-4">
+          جاري تحويلك إلى صفحة تسجيل الدخول...
+        </p>
+      </div>
+    );
+  }
+
+  const roleLabel =
+    adminUser?.role === 'owner'
+      ? 'المالك (Owner)'
+      : adminUser?.role === 'admin' || adminUser?.role === 'super_admin'
+      ? 'المدير العام (Admin)'
+      : adminUser?.role === 'verifier'
+      ? 'مدقق مدفوعات (Verifier)'
+      : adminUser?.role === 'support'
+      ? 'خدمة عملاء (Support)'
+      : 'عضو فريق';
 
   return (
     <div className="min-h-screen bg-[#F4F5F7] text-[#14101F] flex flex-col font-body" dir="rtl">
@@ -76,17 +203,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Link>
 
           {/* Admin User Badge */}
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-xs">
+          <div className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="font-bold text-white">المدير العام (Owner)</span>
+            <span className="font-bold text-white">
+              {adminUser?.name || 'المدير العام'} ({roleLabel})
+            </span>
           </div>
 
           <Link
             href="/"
-            className="text-xs text-[#cbbae7] hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            target="_blank"
+            className="text-xs text-[#cbbae7] hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors hidden sm:block"
           >
             عرض المتجر ↗
           </Link>
+
+          {/* Logout Action Button */}
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            title="تسجيل الخروج من لوحة الإدارة"
+            className="flex items-center gap-1.5 text-xs text-red-300 hover:text-white bg-red-950/40 hover:bg-red-900/60 border border-red-500/20 px-3 py-1.5 rounded-xl transition-all cursor-pointer font-bold disabled:opacity-50"
+          >
+            <span>🚪</span>
+            <span className="hidden sm:inline">خروج</span>
+          </button>
         </div>
       </header>
 
@@ -135,15 +277,27 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Info */}
-          <div className="p-3 bg-[#140626] rounded-2xl border border-[#2A1250] text-[11px] text-[#8E8A9F] space-y-1 mt-6 mb-4">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-white">إصدار النظام:</span>
-              <span className="font-mono text-[#B9F03C]">v1.0-prod</span>
+          {/* Bottom Sidebar Info & Logout */}
+          <div className="space-y-2 mt-6 mb-4">
+            <div className="p-3 bg-[#140626] rounded-2xl border border-[#2A1250] text-[11px] text-[#8E8A9F] space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-white">إصدار النظام:</span>
+                <span className="font-mono text-[#B9F03C]">v1.0-prod</span>
+              </div>
+              <div className="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>جلسة إدارية مشفرة ومؤمنة</span>
+              </div>
             </div>
-            <p className="text-[10px] leading-tight">
-              جلسة عمل مؤمنة ببروتوكول HTTPS وسجلات التدقيق الرقابي نشطة.
-            </p>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-red-950/50 text-[#8E8A9F] hover:text-red-300 border border-white/5 hover:border-red-500/20 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>🚪</span>
+              <span>تسجيل خروج المدير</span>
+            </button>
           </div>
         </aside>
 
